@@ -6,7 +6,12 @@ export interface CMSContent {
   hero: {
     title: string;
     subtitle: string;
+    videoUrl?: string;
     stats: Array<{ value: string; label: string }>;
+  };
+  videos?: {
+    cityVideoUrl: string;
+    investorVideoUrl: string;
   };
   contact: {
     email: string;
@@ -30,12 +35,17 @@ const DEFAULT_CONTENT: CMSContent = {
   hero: {
     title: "Städtische Projekte mit privaten Investoren finanzieren.",
     subtitle: "Banken · Family Offices · Fondsgesellschaften — national und international. Für Infrastruktur, Schulen, Kindergärten und Quartiere. Persönlich vermittelt, kein automatisches Matching, keine Listing-Fee.",
+    videoUrl: "",
     stats: [
       { value: "3.000+", label: "Investoren & Banken" },
       { value: "0,5 %", label: "Provision p.a." },
       { value: "0 €", label: "Listing-Fee" },
       { value: "100 %", label: "Persönliche Betreuung" }
     ]
+  },
+  videos: {
+    cityVideoUrl: "",
+    investorVideoUrl: ""
   },
   contact: {
     email: "kontakt@stadtfinanzen.de",

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowRight, Building2, Handshake, ShieldCheck, Sparkles, Play, Zap, GraduationCap, Hammer, Compass, Layers, Users } from "lucide-react";
+import { ArrowRight, Building2, Handshake, ShieldCheck, Sparkles, Play, Zap, GraduationCap, Hammer, Compass, Layers, Users, X } from "lucide-react";
 import heroCity from "@/assets/hero-city.jpg";
 import videoInvestors from "@/assets/video-investors.jpg";
 import videoCities from "@/assets/video-cities.jpg";
@@ -28,8 +28,32 @@ export const Route = createFileRoute("/")({
   component: HomePage,
 });
 
+function getEmbedUrl(url: string): { type: "iframe" | "video"; url: string } {
+  if (!url) return { type: "video", url: "" };
+  
+  if (url.includes("youtube.com") || url.includes("youtu.be")) {
+    let videoId = "";
+    if (url.includes("youtu.be/")) {
+      videoId = url.split("youtu.be/")[1]?.split(/[?#]/)[0] || "";
+    } else if (url.includes("v=")) {
+      videoId = url.split("v=")[1]?.split(/[&#]/)[0] || "";
+    } else if (url.includes("embed/")) {
+      videoId = url.split("embed/")[1]?.split(/[?#]/)[0] || "";
+    }
+    return { type: "iframe", url: `https://www.youtube.com/embed/${videoId}?autoplay=1` };
+  }
+  
+  if (url.includes("vimeo.com")) {
+    const videoId = url.split("vimeo.com/")[1]?.split(/[?#]/)[0] || "";
+    return { type: "iframe", url: `https://player.vimeo.com/video/${videoId}?autoplay=1` };
+  }
+  
+  return { type: "video", url };
+}
+
 function HomePage() {
   const [content, setContent] = useState<CMSContent | null>(null);
+  const [playingVideoUrl, setPlayingVideoUrl] = useState<string | null>(null);
 
   useEffect(() => {
     getContent().then(setContent);
@@ -43,8 +67,39 @@ function HomePage() {
       <WhyUs />
       <Services />
       <Pricing />
-      <Videos />
+      <Videos content={content} onPlay={setPlayingVideoUrl} />
       <CTASection />
+
+      {playingVideoUrl && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 p-4 backdrop-blur-md transition-all">
+          <div className="relative w-full max-w-4xl overflow-hidden rounded-2xl border border-white/10 bg-zinc-950 shadow-2xl">
+            <button
+              onClick={() => setPlayingVideoUrl(null)}
+              className="absolute right-4 top-4 z-10 rounded-full bg-white/10 p-2 text-white hover:bg-white/20 transition-colors cursor-pointer"
+            >
+              <X className="h-5 w-5" />
+            </button>
+            <div className="aspect-video w-full bg-black">
+              {getEmbedUrl(playingVideoUrl).type === "iframe" ? (
+                <iframe
+                  src={getEmbedUrl(playingVideoUrl).url}
+                  title="Video Player"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                  className="h-full w-full border-0"
+                />
+              ) : (
+                <video
+                  src={getEmbedUrl(playingVideoUrl).url}
+                  controls
+                  autoPlay
+                  className="h-full w-full object-contain"
+                />
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }
@@ -65,7 +120,8 @@ function Hero({ content }: { content: CMSContent | null }) {
   return (
     <section className="relative isolate overflow-hidden">
       <video
-        src={heroVideo.url}
+        src={content?.hero.videoUrl || heroVideo.url}
+        key={content?.hero.videoUrl || heroVideo.url}
         poster={heroCity}
         autoPlay
         loop
@@ -258,10 +314,20 @@ function Pricing() {
   );
 }
 
-function Videos() {
+function Videos({ content, onPlay }: { content: CMSContent | null; onPlay: (url: string) => void }) {
   const items = [
-    { img: videoCities, title: "Für Städte & Kommunen", copy: "Wie Sie über Stadtfinanzen.de seriöses Kapital ansprechen, ohne sensible Details öffentlich preiszugeben." },
-    { img: videoInvestors, title: "Für Investoren", copy: "Wie institutionelle Investoren frühzeitig Zugang zu kuratierten Off-Market-Projekten in Deutschland und Europa erhalten." },
+    { 
+      img: videoCities, 
+      title: "Für Städte & Kommunen", 
+      copy: "Wie Sie über Stadtfinanzen.de seriöses Kapital ansprechen, ohne sensible Details öffentlich preiszugeben.",
+      url: content?.videos?.cityVideoUrl || "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+    },
+    { 
+      img: videoInvestors, 
+      title: "Für Investoren", 
+      copy: "Wie institutionelle Investoren frühzeitig Zugang zu kuratierten Off-Market-Projekten in Deutschland und Europa erhalten.",
+      url: content?.videos?.investorVideoUrl || "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+    },
   ];
   return (
     <section className="border-y border-border bg-secondary/40 py-24">
@@ -269,7 +335,11 @@ function Videos() {
         <SectionHeading eyebrow="Erklärvideos" title="In zwei Minuten verstehen, wie es funktioniert." />
         <div className="mt-12 grid gap-8 md:grid-cols-2">
           {items.map((v) => (
-            <div key={v.title} className="group relative overflow-hidden bg-card shadow-[var(--shadow-card)]">
+            <div 
+              key={v.title} 
+              onClick={() => onPlay(v.url)}
+              className="group relative overflow-hidden bg-card shadow-[var(--shadow-card)] cursor-pointer hover:scale-[1.01] transition-all"
+            >
               <div className="relative aspect-video overflow-hidden">
                 <img src={v.img} alt={v.title} loading="lazy" className="h-full w-full object-cover" />
                 <div className="absolute inset-0 grid place-items-center bg-primary/40 transition-colors group-hover:bg-primary/30">

@@ -15,7 +15,8 @@ import {
   Phone,
   Mail,
   MapPin,
-  MessageSquare
+  MessageSquare,
+  Play
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -580,6 +581,61 @@ function AdminPage() {
                           </div>
                         </div>
                       ))}
+                    </div>
+                  </div>
+
+                  {/* Video settings */}
+                  <div className="rounded-xl border border-border bg-card p-6 shadow-card space-y-4">
+                    <h3 className="font-display text-xl font-bold flex items-center gap-2 border-b border-border pb-3">
+                      <Play className="h-5 w-5 text-accent animate-pulse" /> Video Manager
+                    </h3>
+                    <div className="space-y-4">
+                      <div className="space-y-2">
+                        <label className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">
+                          Hero Background Video URL (MP4 / Direct Link)
+                        </label>
+                        <Input
+                          value={cmsContent.hero.videoUrl || ""}
+                          onChange={(e) => {
+                            const updated = { ...cmsContent };
+                            updated.hero.videoUrl = e.target.value;
+                            setCmsContent(updated);
+                          }}
+                          placeholder="e.g. https://domain.com/my-video.mp4 (leave empty to use default)"
+                        />
+                      </div>
+                      <div className="grid gap-4 sm:grid-cols-2">
+                        <div className="space-y-2">
+                          <label className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">
+                            Explanatory Video 1 (Cities) URL
+                          </label>
+                          <Input
+                            value={cmsContent.videos?.cityVideoUrl || ""}
+                            onChange={(e) => {
+                              const updated = { ...cmsContent };
+                              if (!updated.videos) updated.videos = { cityVideoUrl: "", investorVideoUrl: "" };
+                              updated.videos.cityVideoUrl = e.target.value;
+                              setCmsContent(updated);
+                            }}
+                            placeholder="e.g. https://www.youtube.com/embed/..."
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <label className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">
+                            Explanatory Video 2 (Investors) URL
+                          </label>
+                          <Input
+                            value={cmsContent.videos?.investorVideoUrl || ""}
+                            onChange={(e) => {
+                              const updated = { ...cmsContent };
+                              if (!updated.videos) updated.videos = { cityVideoUrl: "", investorVideoUrl: "" };
+                              updated.videos.investorVideoUrl = e.target.value;
+                              setCmsContent(updated);
+                            }}
+                            placeholder="e.g. https://www.youtube.com/embed/..."
+                          />
+                        </div>
+                      </div>
                     </div>
                   </div>
 
