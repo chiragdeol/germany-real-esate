@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { LanguageTranslator } from "@/components/language-translator";
 
 const nav = [
   { to: "/", label: "Startseite" },
@@ -36,19 +37,23 @@ export function SiteHeader() {
             </Link>
           ))}
         </nav>
-        <div className="hidden md:block">
-          <Button asChild variant="default" size="sm">
-            <Link to="/contact">Jetzt Kontakt aufnehmen</Link>
-          </Button>
+        <div className="flex items-center gap-3">
+          <LanguageTranslator />
+          <div className="hidden md:block">
+            <Button asChild variant="default" size="sm">
+              <Link to="/contact">Jetzt Kontakt aufnehmen</Link>
+            </Button>
+          </div>
+          <button
+            className="md:hidden p-2 -mr-2 text-foreground"
+            onClick={() => setOpen((v) => !v)}
+            aria-label="Toggle menu"
+          >
+            {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+          </button>
         </div>
-        <button
-          className="md:hidden p-2 -mr-2 text-foreground"
-          onClick={() => setOpen((v) => !v)}
-          aria-label="Toggle menu"
-        >
-          {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-        </button>
       </div>
+
       {open && (
         <div className="md:hidden border-t border-border bg-background">
           <nav className="flex flex-col px-6 py-4">
