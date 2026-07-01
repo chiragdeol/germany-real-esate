@@ -8,9 +8,9 @@
  * on your Hostinger server.
  */
 
-define('DB_HOST', '');
-define('DB_USER', '');
-define('DB_PASS', '');
-define('DB_NAME', '');
+define('DB_HOST', 'localhost');
+define('DB_USER', 'u922721203_kommu');
+define('DB_PASS', 'Chirag@123#321');
+define('DB_NAME', 'u922721203_kommu');
 define('DB_PORT', '3306');
 ?>
