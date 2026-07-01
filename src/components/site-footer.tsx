@@ -1,6 +1,14 @@
+import { useState, useEffect } from "react";
 import { Link } from "@tanstack/react-router";
+import { getContent, type CMSContent } from "@/lib/leads";
 
 export function SiteFooter() {
+  const [content, setContent] = useState<CMSContent | null>(null);
+
+  useEffect(() => {
+    getContent().then(setContent);
+  }, []);
+
   return (
     <footer className="border-t border-border bg-primary text-primary-foreground">
       <div className="mx-auto max-w-7xl px-6 py-16">
@@ -28,9 +36,9 @@ export function SiteFooter() {
             <div className="text-xs uppercase tracking-[0.2em] text-accent">Kontakt</div>
             <ul className="mt-4 space-y-2 text-sm text-primary-foreground/80">
               <li>Stadtfinanzen.de</li>
-              <li>Deutschland</li>
-              <li>kontakt@stadtfinanzen.de</li>
-              <li>+49 (0) 30 555 01 20</li>
+              <li>{content?.contact.address || "Deutschland"}</li>
+              <li>{content?.contact.email || "kontakt@stadtfinanzen.de"}</li>
+              <li>{content?.contact.phone || "+49 (0) 30 555 01 20"}</li>
             </ul>
           </div>
         </div>
@@ -46,3 +54,4 @@ export function SiteFooter() {
     </footer>
   );
 }
+

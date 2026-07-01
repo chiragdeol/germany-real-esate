@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowRight, Building2, Handshake, ShieldCheck, Sparkles, Play, Zap, GraduationCap, Hammer, Compass, Layers, Users } from "lucide-react";
 import heroCity from "@/assets/hero-city.jpg";
@@ -5,6 +6,7 @@ import videoInvestors from "@/assets/video-investors.jpg";
 import videoCities from "@/assets/video-cities.jpg";
 import heroVideo from "@/assets/hero-video.mp4.asset.json";
 import { Button } from "@/components/ui/button";
+import { getContent, type CMSContent } from "@/lib/leads";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -27,9 +29,15 @@ export const Route = createFileRoute("/")({
 });
 
 function HomePage() {
+  const [content, setContent] = useState<CMSContent | null>(null);
+
+  useEffect(() => {
+    getContent().then(setContent);
+  }, []);
+
   return (
     <>
-      <Hero />
+      <Hero content={content} />
       <ProjectTypes />
       <HowItWorks />
       <WhyUs />
@@ -41,7 +49,19 @@ function HomePage() {
   );
 }
 
-function Hero() {
+function Hero({ content }: { content: CMSContent | null }) {
+  const titleText = content?.hero.title || "Städtische Projekte mit privaten Investoren finanzieren.";
+  const titleParts = titleText.split("privaten Investoren");
+  
+  const subtitleText = content?.hero.subtitle || "Banken · Family Offices · Fondsgesellschaften — national und international. Für Infrastruktur, Schulen, Kindergärten und Quartiere. Persönlich vermittelt, kein automatisches Matching, keine Listing-Fee.";
+  
+  const stats = content?.hero.stats || [
+    { value: "3.000+", label: "Investoren & Banken" },
+    { value: "0,5 %", label: "Provision p.a." },
+    { value: "0 €", label: "Listing-Fee" },
+    { value: "100 %", label: "Persönliche Betreuung" }
+  ];
+
   return (
     <section className="relative isolate overflow-hidden">
       <video
@@ -60,13 +80,18 @@ function Hero() {
             <Sparkles className="h-3 w-3 text-accent" /> National & International
           </div>
           <h1 className="font-display text-5xl leading-[1.05] sm:text-6xl md:text-7xl">
-            Städtische Projekte mit <span className="text-accent">privaten Investoren</span> finanzieren.
+            {titleParts.length > 1 ? (
+              <>
+                {titleParts[0]}
+                <span className="text-accent">privaten Investoren</span>
+                {titleParts[1]}
+              </>
+            ) : (
+              titleText
+            )}
           </h1>
-          <p className="mt-6 max-w-2xl text-lg text-primary-foreground/80">
-            Banken · Family Offices · Fondsgesellschaften — national und
-            international. Für Infrastruktur, Schulen, Kindergärten und
-            Quartiere. Persönlich vermittelt, kein automatisches Matching,
-            keine Listing-Fee.
+          <p className="mt-6 max-w-2xl text-lg text-primary-foreground/80 leading-relaxed">
+            {subtitleText}
           </p>
           <div className="mt-10 flex flex-wrap gap-4">
             <Button asChild variant="hero" size="lg">
@@ -80,15 +105,10 @@ function Hero() {
           </div>
         </div>
         <dl className="mt-10 grid max-w-3xl grid-cols-2 gap-x-12 gap-y-6 border-t border-primary-foreground/15 pt-10 sm:grid-cols-4">
-          {[
-            ["3.000+", "Investoren & Banken"],
-            ["0,5 %", "Provision p.a."],
-            ["0 €", "Listing-Fee"],
-            ["100 %", "Persönliche Betreuung"],
-          ].map(([v, l]) => (
-            <div key={l}>
-              <dt className="font-display text-3xl text-accent">{v}</dt>
-              <dd className="mt-1 text-xs uppercase tracking-[0.15em] text-primary-foreground/70">{l}</dd>
+          {stats.map((stat, i) => (
+            <div key={i}>
+              <dt className="font-display text-3xl text-accent">{stat.value}</dt>
+              <dd className="mt-1 text-xs uppercase tracking-[0.15em] text-primary-foreground/70">{stat.label}</dd>
             </div>
           ))}
         </dl>

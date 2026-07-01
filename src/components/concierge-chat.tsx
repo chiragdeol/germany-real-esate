@@ -3,13 +3,39 @@ import { useChat } from "@ai-sdk/react";
 import { DefaultChatTransport } from "ai";
 import { MessageCircle, Send, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { submitLead } from "@/lib/leads";
 
 const transport = new DefaultChatTransport({ api: "/api/chat" });
+
+function parseLastMessageFields(text: string) {
+  const fields: Record<string, string> = {};
+  
+  const mappings = [
+    { key: "name", regex: /-\s*(?:Full\s*)?[Nn]ame\s*:\s*(.*)/i },
+    { key: "company", regex: /-\s*(?:Company\s*|\s*[Ff]und\s*):\s*(.*)/i },
+    { key: "email", regex: /-\s*[Ee]mail\s*:\s*(.*)/i },
+    { key: "phone", regex: /-\s*[Pp]hone\s*:\s*(.*)/i },
+    { key: "type", regex: /-\s*(?:Investor\s*Type|User\s*Type|Describe)\s*:\s*(.*)/i },
+    { key: "sector", regex: /-\s*(?:Sector\s*interest|Project\s*type)\s*:\s*(.*)/i },
+    { key: "range", regex: /-\s*(?:Investment\s*range|Investment\s*size)\s*:\s*(.*)/i },
+    { key: "geography", regex: /-\s*(?:Preferred\s*geography|Financing\s*type)\s*:\s*(.*)/i },
+  ];
+  
+  mappings.forEach(({ key, regex }) => {
+    const match = text.match(regex);
+    if (match && match[1]) {
+      fields[key] = match[1].trim();
+    }
+  });
+  
+  return fields;
+}
 
 export function ConciergeChat() {
   const [open, setOpen] = useState(false);
   const [input, setInput] = useState("");
   const scrollRef = useRef<HTMLDivElement>(null);
+  const hasSubmitted = useRef<string | null>(null);
 
   const { messages, sendMessage, status } = useChat({
     id: "concierge",
@@ -30,6 +56,47 @@ export function ConciergeChat() {
 
   const busy = status === "submitted" || status === "streaming";
 
+  // Watch for qualified lead completion
+  useEffect(() => {
+    if (messages.length === 0 || status === "streaming" || status === "submitted") return;
+
+    const lastMessage = messages[messages.length - 1];
+    if (lastMessage && lastMessage.role === "assistant") {
+      const text = lastMessage.parts
+        .map((p) => (p.type === "text" ? p.text : ""))
+        .join("");
+
+      if (text.includes("Your inquiry has been recorded") && hasSubmitted.current !== lastMessage.id) {
+        hasSubmitted.current = lastMessage.id;
+        
+        // Parse structured fields
+        const fields = parseLastMessageFields(text);
+        
+        // Compile full transcript log
+        const transcript = messages.map(m => {
+          const mText = m.parts.map(p => p.type === 'text' ? p.text : '').join('');
+          return `${m.role === 'user' ? 'Visitor' : 'Concierge'}: ${mText}`;
+        }).join('\n');
+
+        const leadData = {
+          name: fields.name || "AI Chat Lead",
+          company: fields.company || "N/A",
+          email: fields.email || "N/A",
+          phone: fields.phone || "N/A",
+          investorType: fields.type || "N/A",
+          range: fields.range || "N/A",
+          details: {
+            ...fields,
+            transcript
+          }
+        };
+
+        // Submit the qualified lead
+        submitLead("chat", leadData);
+      }
+    }
+  }, [messages, status]);
+
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
   }, [messages, status]);
@@ -41,6 +108,7 @@ export function ConciergeChat() {
     setInput("");
     await sendMessage({ text: value });
   }
+
 
   return (
     <>
