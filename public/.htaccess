@@ -1,0 +1,15 @@
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /
+
+  # Route API requests to PHP scripts
+  RewriteRule ^api/leads$ api/leads.php [L]
+  RewriteRule ^api/content$ api/content.php [L]
+  RewriteRule ^api/chat$ api/chat.php [L]
+
+  # Standard SPA Routing
+  RewriteRule ^index\.html$ - [L]
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteRule . /index.html [L]
+</IfModule>
