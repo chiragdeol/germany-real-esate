@@ -16,7 +16,15 @@ import {
   Mail,
   MapPin,
   MessageSquare,
-  Play
+  Play,
+  Layers,
+  Zap,
+  GraduationCap,
+  Hammer,
+  Compass,
+  Sparkles,
+  ChevronRight,
+  Image as ImageIcon
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -41,6 +49,7 @@ function AdminPage() {
   
   // Dashboard states
   const [activeTab, setActiveTab] = useState<"dashboard" | "leads" | "cms">("dashboard");
+  const [cmsSection, setCmsSection] = useState<"hero" | "media" | "projects" | "services" | "pricing" | "about" | "contact" | "blog">("hero");
   const [leads, setLeads] = useState<any[]>([]);
   const [cmsContent, setCmsContent] = useState<CMSContent | null>(null);
   const [loading, setLoading] = useState(true);
@@ -68,6 +77,21 @@ function AdminPage() {
       try {
         const fetchedLeads = await getLeads(adminToken);
         const fetchedContent = await getContent();
+        
+        // Ensure sub-objects have array initializers
+        if (!fetchedContent.projectTypesList) fetchedContent.projectTypesList = [];
+        if (!fetchedContent.homepageServices) fetchedContent.homepageServices = [];
+        if (!fetchedContent.pricingTiers) fetchedContent.pricingTiers = [];
+        if (!fetchedContent.about) {
+          fetchedContent.about = {
+            title: "",
+            introTitle: "",
+            introText1: "",
+            introText2: "",
+            projectTypes: []
+          };
+        }
+        
         setLeads(fetchedLeads);
         setCmsContent(fetchedContent);
       } catch (err) {
@@ -82,7 +106,6 @@ function AdminPage() {
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    // Simple secure admin login credentials (admin/admin)
     if (password === "admin") {
       const token = "admin-secret-token";
       localStorage.setItem("civita_admin_token", token);
@@ -106,7 +129,6 @@ function AdminPage() {
     if (!cmsContent) return;
     const ok = await saveContent(cmsContent, adminToken);
     if (ok) {
-      // Reload updated content
       const updated = await getContent();
       setCmsContent(updated);
     }
@@ -161,7 +183,6 @@ function AdminPage() {
     const matchesType = leadsFilter === "all" || lead.type === leadsFilter;
     const searchLower = leadsSearch.toLowerCase();
     
-    // Safety check for keys
     const name = (lead.data?.name || "").toLowerCase();
     const company = (lead.data?.company || "").toLowerCase();
     const email = (lead.data?.email || "").toLowerCase();
@@ -177,7 +198,7 @@ function AdminPage() {
   });
 
   return (
-    <div className="min-h-screen bg-muted/20">
+    <div className="min-h-screen bg-muted/20 pb-20">
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="flex flex-col gap-4 border-b border-border pb-6 sm:flex-row sm:items-center sm:justify-between">
@@ -197,7 +218,7 @@ function AdminPage() {
           {[
             { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
             { id: "leads", label: "Leads Submissions", icon: Users },
-            { id: "cms", label: "Website CMS", icon: FileText },
+            { id: "cms", label: "Visual CMS Panel", icon: FileText },
           ].map((t) => {
             const Icon = t.icon;
             return (
@@ -229,13 +250,12 @@ function AdminPage() {
             {/* 1. DASHBOARD TAB */}
             {activeTab === "dashboard" && (
               <div className="grid gap-6">
-                {/* Stats Cards */}
                 <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
                   {[
                     { label: "Total Leads", val: totalLeads, desc: "Total submissions & chats", color: "text-primary bg-primary/10" },
                     { label: "Investor Leads", val: investorLeadsCount, desc: "Via Investor Registration", color: "text-accent bg-accent/10" },
                     { label: "City Leads", val: cityLeadsCount, desc: "Via City Project Form", color: "text-green-600 bg-green-50" },
-                    { label: "AI Concierge Leads", val: chatLeadsCount, desc: "Fully Qualified Chats", color: "text-purple-600 bg-purple-50" },
+                    { label: "AI Concierge Leads", val: chatLeadsCount, desc: "Form & AI Chat Leads", color: "text-purple-600 bg-purple-50" },
                   ].map((s) => (
                     <div key={s.label} className="rounded-xl border border-border bg-card p-6 shadow-card">
                       <div className="flex items-center justify-between">
@@ -248,7 +268,6 @@ function AdminPage() {
                   ))}
                 </div>
 
-                {/* Recent Leads list */}
                 <div className="rounded-xl border border-border bg-card p-6 shadow-card">
                   <h3 className="font-display text-xl font-bold mb-4">Recent Submissions</h3>
                   {leads.length === 0 ? (
@@ -297,10 +316,8 @@ function AdminPage() {
             {/* 2. LEADS TAB */}
             {activeTab === "leads" && (
               <div className="grid gap-6 lg:grid-cols-3">
-                {/* Leads List Side */}
                 <div className="lg:col-span-2 space-y-4">
                   <div className="rounded-xl border border-border bg-card p-4 shadow-card flex flex-col gap-4 sm:flex-row items-center justify-between">
-                    {/* Search bar */}
                     <div className="relative w-full sm:max-w-xs">
                       <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                       <Input
@@ -310,7 +327,6 @@ function AdminPage() {
                         className="pl-9 h-10 text-sm"
                       />
                     </div>
-                    {/* Filter Type */}
                     <div className="flex gap-2 w-full sm:w-auto">
                       {(["all", "investor", "city", "chat"] as const).map((f) => (
                         <button
@@ -322,7 +338,7 @@ function AdminPage() {
                               : "bg-background border-border text-muted-foreground hover:text-foreground"
                           }`}
                         >
-                          {f === "all" ? "All" : f === "chat" ? "AI Chat" : f}
+                          {f === "all" ? "All" : f === "chat" ? "AI / Form Chat" : f}
                         </button>
                       ))}
                     </div>
@@ -371,7 +387,7 @@ function AdminPage() {
                                       ? "bg-green-50 text-green-600" 
                                       : "bg-purple-50 text-purple-600"
                                   }`}>
-                                    {lead.type === "chat" ? "AI Chat" : lead.type}
+                                    {lead.type === "chat" ? "AI / Form Chat" : lead.type}
                                   </span>
                                 </td>
                                 <td className="px-6 py-4 text-xs text-muted-foreground">
@@ -392,7 +408,6 @@ function AdminPage() {
                   </div>
                 </div>
 
-                {/* Lead Detail Panel Side */}
                 <div className="rounded-xl border border-border bg-card p-6 shadow-card h-fit">
                   {selectedLead ? (
                     <div className="space-y-6">
@@ -477,18 +492,18 @@ function AdminPage() {
                           <div className="border-t border-border pt-4 space-y-4">
                             <div className="grid grid-cols-2 gap-4">
                               <div>
-                                <label className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">User Type</label>
+                                <label className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">User Type / Path</label>
                                 <div className="text-sm font-medium mt-0.5 capitalize">{selectedLead.data?.investorType || "N/A"}</div>
                               </div>
                               <div>
-                                <label className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Range / size</label>
-                                <div className="text-sm font-medium mt-0.5">{selectedLead.data?.range || "N/A"}</div>
+                                <label className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Message / range</label>
+                                <div className="text-sm font-medium mt-0.5">{selectedLead.data?.message || selectedLead.data?.range || "N/A"}</div>
                               </div>
                             </div>
                             
                             <div>
                               <label className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold flex items-center gap-1">
-                                <MessageSquare className="h-3 w-3" /> Full Chat Transcript
+                                <MessageSquare className="h-3 w-3" /> Chat Details & Transcripts
                               </label>
                               <div className="text-xs font-mono text-foreground bg-muted/50 border rounded-lg p-3 mt-1 max-h-60 overflow-y-auto whitespace-pre-wrap leading-relaxed">
                                 {selectedLead.data?.details?.transcript || "N/A"}
@@ -510,90 +525,148 @@ function AdminPage() {
 
             {/* 3. CMS TAB */}
             {activeTab === "cms" && cmsContent && (
-              <div className="grid gap-6 lg:grid-cols-3">
-                {/* CMS Form Editor */}
-                <div className="lg:col-span-2 space-y-6">
-                  {/* Hero Section settings */}
-                  <div className="rounded-xl border border-border bg-card p-6 shadow-card space-y-4">
-                    <h3 className="font-display text-xl font-bold flex items-center gap-2 border-b border-border pb-3">
-                      <Globe className="h-5 w-5 text-accent" /> Hero Section (Startseite)
-                    </h3>
-                    
-                    <div className="space-y-2">
-                      <label className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">
-                        Hero Title (German)
-                      </label>
-                      <Textarea
-                        value={cmsContent.hero.title}
-                        onChange={(e) => {
-                          const updated = { ...cmsContent };
-                          updated.hero.title = e.target.value;
-                          setCmsContent(updated);
-                        }}
-                        rows={2}
-                        className="font-medium"
-                      />
-                    </div>
+              <div className="grid gap-6 md:grid-cols-[240px_1fr]">
+                {/* CMS Sidebar Navigation */}
+                <div className="flex flex-col gap-1 border-r border-border/80 pr-4 h-fit">
+                  {[
+                    { id: "hero", label: "Hero & Metrics", icon: Globe },
+                    { id: "media", label: "Background Media", icon: ImageIcon },
+                    { id: "projects", label: "Projekttypen Cards", icon: Hammer },
+                    { id: "services", label: "Leistungen Cards", icon: Compass },
+                    { id: "pricing", label: "Preise (Pricing)", icon: Sparkles },
+                    { id: "about", label: "Über Uns Page", icon: FileText },
+                    { id: "contact", label: "Kontakt Details", icon: Phone },
+                    { id: "blog", label: "Blog Articles", icon: FileText }
+                  ].map((s) => {
+                    const Icon = s.icon;
+                    return (
+                      <button
+                        key={s.id}
+                        onClick={() => setCmsSection(s.id as any)}
+                        className={`flex items-center justify-between px-3 py-2 text-xs font-semibold rounded-md border text-left cursor-pointer transition-colors ${
+                          cmsSection === s.id
+                            ? "bg-accent/15 border-accent text-accent"
+                            : "bg-background border-transparent text-muted-foreground hover:text-foreground hover:bg-muted/40"
+                        }`}
+                      >
+                        <span className="flex items-center gap-2">
+                          <Icon className="h-3.5 w-3.5" /> {s.label}
+                        </span>
+                        <ChevronRight className="h-3 w-3 opacity-60" />
+                      </button>
+                    );
+                  })}
 
-                    <div className="space-y-2">
-                      <label className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">
-                        Hero Subtitle (German)
-                      </label>
-                      <Textarea
-                        value={cmsContent.hero.subtitle}
-                        onChange={(e) => {
-                          const updated = { ...cmsContent };
-                          updated.hero.subtitle = e.target.value;
-                          setCmsContent(updated);
-                        }}
-                        rows={4}
-                      />
-                    </div>
-
-                    {/* Stats editing */}
-                    <div className="grid gap-4 sm:grid-cols-2 pt-2">
-                      {cmsContent.hero.stats.map((stat, i) => (
-                        <div key={i} className="border border-border/80 bg-muted/20 p-3 rounded-lg grid gap-2">
-                          <label className="text-[10px] uppercase tracking-wider text-accent font-bold">
-                            Metric {i + 1}
-                          </label>
-                          <div className="flex gap-2">
-                            <Input
-                              value={stat.value}
-                              onChange={(e) => {
-                                const updated = { ...cmsContent };
-                                updated.hero.stats[i].value = e.target.value;
-                                setCmsContent(updated);
-                              }}
-                              placeholder="Value"
-                              className="w-1/3 text-sm h-9"
-                            />
-                            <Input
-                              value={stat.label}
-                              onChange={(e) => {
-                                const updated = { ...cmsContent };
-                                updated.hero.stats[i].label = e.target.value;
-                                setCmsContent(updated);
-                              }}
-                              placeholder="Label"
-                              className="w-2/3 text-sm h-9"
-                            />
-                          </div>
-                        </div>
-                      ))}
-                    </div>
+                  <div className="mt-8 border-t border-border pt-4">
+                    <Button onClick={handleSaveCMS} className="w-full gap-2 cursor-pointer flex items-center justify-center h-10 font-bold text-xs">
+                      <Save className="h-4 w-4" /> Save changes
+                    </Button>
                   </div>
+                </div>
 
-                  {/* Video settings */}
-                  <div className="rounded-xl border border-border bg-card p-6 shadow-card space-y-4">
-                    <h3 className="font-display text-xl font-bold flex items-center gap-2 border-b border-border pb-3">
-                      <Play className="h-5 w-5 text-accent animate-pulse" /> Video Manager
-                    </h3>
+                {/* CMS Form Editor Area */}
+                <div className="bg-card border border-border rounded-xl p-6 shadow-card space-y-6">
+                  
+                  {/* Hero Settings */}
+                  {cmsSection === "hero" && (
                     <div className="space-y-4">
+                      <h3 className="font-display text-lg font-bold border-b pb-2">Hero & Statistics</h3>
+                      
                       <div className="space-y-2">
-                        <label className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">
-                          Hero Background Video URL (MP4 / Direct Link)
-                        </label>
+                        <label className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">Hero Title</label>
+                        <Textarea
+                          value={cmsContent.hero.title}
+                          onChange={(e) => {
+                            const updated = { ...cmsContent };
+                            updated.hero.title = e.target.value;
+                            setCmsContent(updated);
+                          }}
+                          rows={2}
+                          className="font-medium"
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <label className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">Hero Subtitle</label>
+                        <Textarea
+                          value={cmsContent.hero.subtitle}
+                          onChange={(e) => {
+                            const updated = { ...cmsContent };
+                            updated.hero.subtitle = e.target.value;
+                            setCmsContent(updated);
+                          }}
+                          rows={4}
+                        />
+                      </div>
+
+                      <div className="space-y-2 pt-2">
+                        <label className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">Metric stats cards (4 items)</label>
+                        <div className="grid gap-4 sm:grid-cols-2">
+                          {cmsContent.hero.stats.map((stat, i) => (
+                            <div key={i} className="border border-border/80 bg-muted/20 p-3 rounded-lg flex gap-2">
+                              <Input
+                                value={stat.value}
+                                onChange={(e) => {
+                                  const updated = { ...cmsContent };
+                                  updated.hero.stats[i].value = e.target.value;
+                                  setCmsContent(updated);
+                                }}
+                                placeholder="Value"
+                                className="w-1/3 text-xs h-8"
+                              />
+                              <Input
+                                value={stat.label}
+                                onChange={(e) => {
+                                  const updated = { ...cmsContent };
+                                  updated.hero.stats[i].label = e.target.value;
+                                  setCmsContent(updated);
+                                }}
+                                placeholder="Label"
+                                className="w-2/3 text-xs h-8"
+                              />
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Background Media */}
+                  {cmsSection === "media" && (
+                    <div className="space-y-4">
+                      <h3 className="font-display text-lg font-bold border-b pb-2">Background media configuration</h3>
+                      
+                      <div className="space-y-2">
+                        <label className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">Background Media Type</label>
+                        <select
+                          value={cmsContent.hero.bgType || "video"}
+                          onChange={(e) => {
+                            const updated = { ...cmsContent };
+                            updated.hero.bgType = e.target.value as any;
+                            setCmsContent(updated);
+                          }}
+                          className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm outline-none focus:border-accent"
+                        >
+                          <option value="video">Explanatory Video (Loops in Background)</option>
+                          <option value="image">Custom Background Image</option>
+                        </select>
+                      </div>
+
+                      <div className="space-y-2">
+                        <label className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">Background Image URL (Loads if Image Selected)</label>
+                        <Input
+                          value={cmsContent.hero.imageUrl || ""}
+                          onChange={(e) => {
+                            const updated = { ...cmsContent };
+                            updated.hero.imageUrl = e.target.value;
+                            setCmsContent(updated);
+                          }}
+                          placeholder="e.g. https://images.unsplash.com/photo-..."
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <label className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">Background Video URL (Loads if Video Selected)</label>
                         <Input
                           value={cmsContent.hero.videoUrl || ""}
                           onChange={(e) => {
@@ -601,14 +674,418 @@ function AdminPage() {
                             updated.hero.videoUrl = e.target.value;
                             setCmsContent(updated);
                           }}
-                          placeholder="e.g. https://domain.com/my-video.mp4 (leave empty to use default)"
+                          placeholder="e.g. Direct MP4 link"
                         />
                       </div>
-                      <div className="grid gap-4 sm:grid-cols-2">
+                    </div>
+                  )}
+
+                  {/* Projekttypen Cards */}
+                  {cmsSection === "projects" && (
+                    <div className="space-y-4">
+                      <div className="flex justify-between items-center border-b pb-2">
+                        <h3 className="font-display text-lg font-bold">Homepage Project Types List</h3>
+                        <Button
+                          size="xs"
+                          variant="accent"
+                          className="font-bold text-xs"
+                          onClick={() => {
+                            const updated = { ...cmsContent };
+                            if (!updated.projectTypesList) updated.projectTypesList = [];
+                            updated.projectTypesList.push({
+                              title: "Neue Kategorie",
+                              copy: "Kurze Beschreibung des Projekttyps...",
+                              icon: "Building2"
+                            });
+                            setCmsContent(updated);
+                          }}
+                        >
+                          <Plus className="h-3 w-3 mr-1" /> Add Type
+                        </Button>
+                      </div>
+
+                      <div className="space-y-4">
+                        {(cmsContent.projectTypesList || []).map((item, index) => (
+                          <div key={index} className="relative p-4 border rounded-xl bg-muted/10 space-y-3">
+                            <button
+                              onClick={() => {
+                                const updated = { ...cmsContent };
+                                updated.projectTypesList?.splice(index, 1);
+                                setCmsContent(updated);
+                              }}
+                              className="absolute top-2 right-2 text-muted-foreground hover:text-destructive transition-colors cursor-pointer"
+                              title="Delete Item"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </button>
+
+                            <div className="grid gap-3 sm:grid-cols-2">
+                              <div className="space-y-1">
+                                <label className="text-[10px] uppercase tracking-wider text-muted-foreground font-bold">Title</label>
+                                <Input
+                                  value={item.title}
+                                  onChange={(e) => {
+                                    const updated = { ...cmsContent };
+                                    if (updated.projectTypesList) updated.projectTypesList[index].title = e.target.value;
+                                    setCmsContent(updated);
+                                  }}
+                                  className="h-8 text-xs font-semibold"
+                                />
+                              </div>
+                              <div className="space-y-1">
+                                <label className="text-[10px] uppercase tracking-wider text-muted-foreground font-bold">Icon Name</label>
+                                <select
+                                  value={item.icon}
+                                  onChange={(e) => {
+                                    const updated = { ...cmsContent };
+                                    if (updated.projectTypesList) updated.projectTypesList[index].icon = e.target.value;
+                                    setCmsContent(updated);
+                                  }}
+                                  className="w-full rounded-md border border-border bg-background px-2 py-1.5 text-xs outline-none focus:border-accent"
+                                >
+                                  {["Building2", "Zap", "GraduationCap", "Hammer", "Compass", "Layers", "Users", "ShieldCheck", "Handshake", "Sparkles"].map((icon) => (
+                                    <option key={icon} value={icon}>{icon}</option>
+                                  ))}
+                                </select>
+                              </div>
+                            </div>
+
+                            <div className="space-y-1">
+                              <label className="text-[10px] uppercase tracking-wider text-muted-foreground font-bold">Copy / Description</label>
+                              <Textarea
+                                value={item.copy}
+                                onChange={(e) => {
+                                  const updated = { ...cmsContent };
+                                  if (updated.projectTypesList) updated.projectTypesList[index].copy = e.target.value;
+                                  setCmsContent(updated);
+                                }}
+                                rows={2}
+                                className="text-xs"
+                              />
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Services Cards */}
+                  {cmsSection === "services" && (
+                    <div className="space-y-4">
+                      <div className="flex justify-between items-center border-b pb-2">
+                        <h3 className="font-display text-lg font-bold">Homepage Services List</h3>
+                        <Button
+                          size="xs"
+                          variant="accent"
+                          className="font-bold text-xs"
+                          onClick={() => {
+                            const updated = { ...cmsContent };
+                            if (!updated.homepageServices) updated.homepageServices = [];
+                            updated.homepageServices.push({
+                              title: "Neue Leistung",
+                              copy: "Kurze Beschreibung der Leistung...",
+                              icon: "Compass"
+                            });
+                            setCmsContent(updated);
+                          }}
+                        >
+                          <Plus className="h-3 w-3 mr-1" /> Add Service
+                        </Button>
+                      </div>
+
+                      <div className="space-y-4">
+                        {(cmsContent.homepageServices || []).map((item, index) => (
+                          <div key={index} className="relative p-4 border rounded-xl bg-muted/10 space-y-3">
+                            <button
+                              onClick={() => {
+                                const updated = { ...cmsContent };
+                                updated.homepageServices?.splice(index, 1);
+                                setCmsContent(updated);
+                              }}
+                              className="absolute top-2 right-2 text-muted-foreground hover:text-destructive transition-colors cursor-pointer"
+                              title="Delete Item"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </button>
+
+                            <div className="grid gap-3 sm:grid-cols-2">
+                              <div className="space-y-1">
+                                <label className="text-[10px] uppercase tracking-wider text-muted-foreground font-bold">Service Title</label>
+                                <Input
+                                  value={item.title}
+                                  onChange={(e) => {
+                                    const updated = { ...cmsContent };
+                                    if (updated.homepageServices) updated.homepageServices[index].title = e.target.value;
+                                    setCmsContent(updated);
+                                  }}
+                                  className="h-8 text-xs font-semibold"
+                                />
+                              </div>
+                              <div className="space-y-1">
+                                <label className="text-[10px] uppercase tracking-wider text-muted-foreground font-bold">Icon Name</label>
+                                <select
+                                  value={item.icon}
+                                  onChange={(e) => {
+                                    const updated = { ...cmsContent };
+                                    if (updated.homepageServices) updated.homepageServices[index].icon = e.target.value;
+                                    setCmsContent(updated);
+                                  }}
+                                  className="w-full rounded-md border border-border bg-background px-2 py-1.5 text-xs outline-none focus:border-accent"
+                                >
+                                  {["Compass", "Layers", "Users", "Building2", "Zap", "GraduationCap", "Hammer", "ShieldCheck", "Handshake", "Sparkles"].map((icon) => (
+                                    <option key={icon} value={icon}>{icon}</option>
+                                  ))}
+                                </select>
+                              </div>
+                            </div>
+
+                            <div className="space-y-1">
+                              <label className="text-[10px] uppercase tracking-wider text-muted-foreground font-bold">Description Copy</label>
+                              <Textarea
+                                value={item.copy}
+                                onChange={(e) => {
+                                  const updated = { ...cmsContent };
+                                  if (updated.homepageServices) updated.homepageServices[index].copy = e.target.value;
+                                  setCmsContent(updated);
+                                }}
+                                rows={2}
+                                className="text-xs"
+                              />
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Pricing Tiers */}
+                  {cmsSection === "pricing" && (
+                    <div className="space-y-4">
+                      <div className="flex justify-between items-center border-b pb-2">
+                        <h3 className="font-display text-lg font-bold">Website Pricing Tiers</h3>
+                        <Button
+                          size="xs"
+                          variant="accent"
+                          className="font-bold text-xs"
+                          onClick={() => {
+                            const updated = { ...cmsContent };
+                            if (!updated.pricingTiers) updated.pricingTiers = [];
+                            updated.pricingTiers.push({
+                              title: "Neues Preismodell",
+                              copy: "Preismodell Beschreibung..."
+                            });
+                            setCmsContent(updated);
+                          }}
+                        >
+                          <Plus className="h-3 w-3 mr-1" /> Add Tier
+                        </Button>
+                      </div>
+
+                      <div className="space-y-4">
+                        {(cmsContent.pricingTiers || []).map((item, index) => (
+                          <div key={index} className="relative p-4 border rounded-xl bg-muted/10 space-y-3">
+                            <button
+                              onClick={() => {
+                                const updated = { ...cmsContent };
+                                updated.pricingTiers?.splice(index, 1);
+                                setCmsContent(updated);
+                              }}
+                              className="absolute top-2 right-2 text-muted-foreground hover:text-destructive transition-colors cursor-pointer"
+                              title="Delete Item"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </button>
+
+                            <div className="space-y-1">
+                              <label className="text-[10px] uppercase tracking-wider text-muted-foreground font-bold">Tier Title</label>
+                              <Input
+                                value={item.title}
+                                onChange={(e) => {
+                                  const updated = { ...cmsContent };
+                                  if (updated.pricingTiers) updated.pricingTiers[index].title = e.target.value;
+                                  setCmsContent(updated);
+                                }}
+                                className="h-8 text-xs font-semibold"
+                              />
+                            </div>
+
+                            <div className="space-y-1">
+                              <label className="text-[10px] uppercase tracking-wider text-muted-foreground font-bold">Copy description</label>
+                              <Textarea
+                                value={item.copy}
+                                onChange={(e) => {
+                                  const updated = { ...cmsContent };
+                                  if (updated.pricingTiers) updated.pricingTiers[index].copy = e.target.value;
+                                  setCmsContent(updated);
+                                }}
+                                rows={2}
+                                className="text-xs"
+                              />
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* About Page */}
+                  {cmsSection === "about" && cmsContent.about && (
+                    <div className="space-y-4">
+                      <h3 className="font-display text-lg font-bold border-b pb-2">Leistungen & Preise (About Page) CMS</h3>
+                      
+                      <div className="space-y-2">
+                        <label className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">Page Main Title</label>
+                        <Input
+                          value={cmsContent.about.title}
+                          onChange={(e) => {
+                            const updated = { ...cmsContent };
+                            if (updated.about) updated.about.title = e.target.value;
+                            setCmsContent(updated);
+                          }}
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <label className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">Intro Title ("Sie bleiben in Kontrolle")</label>
+                        <Input
+                          value={cmsContent.about.introTitle}
+                          onChange={(e) => {
+                            const updated = { ...cmsContent };
+                            if (updated.about) updated.about.introTitle = e.target.value;
+                            setCmsContent(updated);
+                          }}
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <label className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">Intro Paragraph 1</label>
+                        <Textarea
+                          value={cmsContent.about.introText1}
+                          onChange={(e) => {
+                            const updated = { ...cmsContent };
+                            if (updated.about) updated.about.introText1 = e.target.value;
+                            setCmsContent(updated);
+                          }}
+                          rows={3}
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <label className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">Intro Paragraph 2</label>
+                        <Textarea
+                          value={cmsContent.about.introText2}
+                          onChange={(e) => {
+                            const updated = { ...cmsContent };
+                            if (updated.about) updated.about.introText2 = e.target.value;
+                            setCmsContent(updated);
+                          }}
+                          rows={4}
+                        />
+                      </div>
+
+                      <div className="space-y-3 pt-2">
+                        <div className="flex justify-between items-center border-b pb-1">
+                          <label className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">Projekttypen Checklist Bullet points</label>
+                          <Button
+                            size="xs"
+                            variant="outline"
+                            className="h-6 text-[10px] px-2 cursor-pointer"
+                            onClick={() => {
+                              const updated = { ...cmsContent };
+                              if (updated.about) {
+                                if (!updated.about.projectTypes) updated.about.projectTypes = [];
+                                updated.about.projectTypes.push("Neuer Listeneintrag");
+                              }
+                              setCmsContent(updated);
+                            }}
+                          >
+                            + Add Bullet
+                          </Button>
+                        </div>
+
                         <div className="space-y-2">
-                          <label className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">
-                            Explanatory Video 1 (Cities) URL
+                          {(cmsContent.about.projectTypes || []).map((bullet, i) => (
+                            <div key={i} className="flex gap-2 items-center">
+                              <Input
+                                value={bullet}
+                                onChange={(e) => {
+                                  const updated = { ...cmsContent };
+                                  if (updated.about?.projectTypes) {
+                                    updated.about.projectTypes[i] = e.target.value;
+                                  }
+                                  setCmsContent(updated);
+                                }}
+                                className="h-8 text-xs flex-1"
+                              />
+                              <button
+                                onClick={() => {
+                                  const updated = { ...cmsContent };
+                                  updated.about?.projectTypes.splice(i, 1);
+                                  setCmsContent(updated);
+                                }}
+                                className="text-muted-foreground hover:text-destructive cursor-pointer transition-colors"
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Contact details */}
+                  {cmsSection === "contact" && (
+                    <div className="space-y-4">
+                      <h3 className="font-display text-lg font-bold border-b pb-2">Global Contact Fields</h3>
+                      
+                      <div className="grid gap-4 sm:grid-cols-2">
+                        <div className="space-y-1">
+                          <label className="text-xs uppercase tracking-wider text-muted-foreground font-semibold flex items-center gap-1">
+                            <Mail className="h-3.5 w-3.5 opacity-60" /> Email Address
                           </label>
+                          <Input
+                            value={cmsContent.contact.email}
+                            onChange={(e) => {
+                              const updated = { ...cmsContent };
+                              updated.contact.email = e.target.value;
+                              setCmsContent(updated);
+                            }}
+                          />
+                        </div>
+                        <div className="space-y-1">
+                          <label className="text-xs uppercase tracking-wider text-muted-foreground font-semibold flex items-center gap-1">
+                            <Phone className="h-3.5 w-3.5 opacity-60" /> Phone Number
+                          </label>
+                          <Input
+                            value={cmsContent.contact.phone}
+                            onChange={(e) => {
+                              const updated = { ...cmsContent };
+                              updated.contact.phone = e.target.value;
+                              setCmsContent(updated);
+                            }}
+                          />
+                        </div>
+                      </div>
+
+                      <div className="space-y-1">
+                        <label className="text-xs uppercase tracking-wider text-muted-foreground font-semibold flex items-center gap-1">
+                          <MapPin className="h-3.5 w-3.5 opacity-60" /> Location Address
+                        </label>
+                        <Input
+                          value={cmsContent.contact.address}
+                          onChange={(e) => {
+                            const updated = { ...cmsContent };
+                            updated.contact.address = e.target.value;
+                            setCmsContent(updated);
+                          }}
+                        />
+                      </div>
+
+                      <h3 className="font-display text-lg font-bold border-b pt-4 pb-2">Explanatory Video Popup Links</h3>
+                      <div className="grid gap-4 sm:grid-cols-2">
+                        <div className="space-y-1">
+                          <label className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">Explanatory Video 1 (Cities)</label>
                           <Input
                             value={cmsContent.videos?.cityVideoUrl || ""}
                             onChange={(e) => {
@@ -617,13 +1094,11 @@ function AdminPage() {
                               updated.videos.cityVideoUrl = e.target.value;
                               setCmsContent(updated);
                             }}
-                            placeholder="e.g. https://www.youtube.com/embed/..."
+                            placeholder="e.g. YouTube Embed Link"
                           />
                         </div>
-                        <div className="space-y-2">
-                          <label className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">
-                            Explanatory Video 2 (Investors) URL
-                          </label>
+                        <div className="space-y-1">
+                          <label className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">Explanatory Video 2 (Investors)</label>
                           <Input
                             value={cmsContent.videos?.investorVideoUrl || ""}
                             onChange={(e) => {
@@ -632,189 +1107,129 @@ function AdminPage() {
                               updated.videos.investorVideoUrl = e.target.value;
                               setCmsContent(updated);
                             }}
-                            placeholder="e.g. https://www.youtube.com/embed/..."
+                            placeholder="e.g. YouTube Embed Link"
                           />
                         </div>
                       </div>
                     </div>
-                  </div>
+                  )}
 
-                  {/* Contact settings */}
-                  <div className="rounded-xl border border-border bg-card p-6 shadow-card space-y-4">
-                    <h3 className="font-display text-xl font-bold flex items-center gap-2 border-b border-border pb-3">
-                      <Phone className="h-5 w-5 text-accent" /> Contact Details
-                    </h3>
-                    <div className="grid gap-4 sm:grid-cols-2">
-                      <div className="space-y-2">
-                        <label className="text-xs uppercase tracking-wider text-muted-foreground font-semibold flex items-center gap-1">
-                          <Mail className="h-3.5 w-3.5 opacity-60" /> Email Address
-                        </label>
-                        <Input
-                          value={cmsContent.contact.email}
-                          onChange={(e) => {
+                  {/* Blog articles list */}
+                  {cmsSection === "blog" && (
+                    <div className="space-y-4">
+                      <div className="flex justify-between items-center border-b pb-2">
+                        <h3 className="font-display text-lg font-bold flex items-center gap-2">
+                          <FileText className="h-5 w-5" /> Manage Blog Articles
+                        </h3>
+                        <Button
+                          size="xs"
+                          variant="accent"
+                          className="font-bold text-xs"
+                          onClick={() => {
                             const updated = { ...cmsContent };
-                            updated.contact.email = e.target.value;
+                            const newId = `post-${Date.now()}`;
+                            updated.posts.push({
+                              id: newId,
+                              tag: "Kategorie",
+                              title: "Neuer Blog-Titel",
+                              excerpt: "Zusammenfassung des Artikels...",
+                              date: new Date().toLocaleDateString("de-DE", { month: "long", year: "numeric" }),
+                              read: "5 Min. Lesezeit"
+                            });
                             setCmsContent(updated);
+                            toast.info("Added draft. Save to apply.");
                           }}
-                        />
+                        >
+                          <Plus className="h-3 w-3 mr-1" /> Add Article
+                        </Button>
                       </div>
-                      <div className="space-y-2">
-                        <label className="text-xs uppercase tracking-wider text-muted-foreground font-semibold flex items-center gap-1">
-                          <Phone className="h-3.5 w-3.5 opacity-60" /> Phone Number
-                        </label>
-                        <Input
-                          value={cmsContent.contact.phone}
-                          onChange={(e) => {
-                            const updated = { ...cmsContent };
-                            updated.contact.phone = e.target.value;
-                            setCmsContent(updated);
-                          }}
-                        />
+
+                      <div className="space-y-4 max-h-[500px] overflow-y-auto pr-1">
+                        {cmsContent.posts.map((post, index) => (
+                          <div key={post.id} className="relative p-4 border border-border bg-muted/10 rounded-xl space-y-3">
+                            <button
+                              onClick={() => {
+                                const updated = { ...cmsContent };
+                                updated.posts.splice(index, 1);
+                                setCmsContent(updated);
+                                toast.warning("Deleted draft. Save to apply.");
+                              }}
+                              className="absolute top-2 right-2 text-muted-foreground hover:text-destructive transition-colors cursor-pointer"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </button>
+
+                            <div className="grid gap-3 sm:grid-cols-3">
+                              <div className="space-y-1">
+                                <label className="text-[10px] uppercase tracking-wider text-muted-foreground font-bold">Category Tag</label>
+                                <Input
+                                  value={post.tag}
+                                  onChange={(e) => {
+                                    const updated = { ...cmsContent };
+                                    updated.posts[index].tag = e.target.value;
+                                    setCmsContent(updated);
+                                  }}
+                                  className="h-8 text-xs font-semibold"
+                                />
+                              </div>
+                              <div className="space-y-1">
+                                <label className="text-[10px] uppercase tracking-wider text-muted-foreground font-bold">Publish Date</label>
+                                <Input
+                                  value={post.date}
+                                  onChange={(e) => {
+                                    const updated = { ...cmsContent };
+                                    updated.posts[index].date = e.target.value;
+                                    setCmsContent(updated);
+                                  }}
+                                  className="h-8 text-xs"
+                                />
+                              </div>
+                              <div className="space-y-1">
+                                <label className="text-[10px] uppercase tracking-wider text-muted-foreground font-bold">Read Time</label>
+                                <Input
+                                  value={post.read}
+                                  onChange={(e) => {
+                                    const updated = { ...cmsContent };
+                                    updated.posts[index].read = e.target.value;
+                                    setCmsContent(updated);
+                                  }}
+                                  className="h-8 text-xs"
+                                />
+                              </div>
+                            </div>
+
+                            <div className="space-y-1">
+                              <label className="text-[10px] uppercase tracking-wider text-muted-foreground font-bold">Title</label>
+                              <Input
+                                value={post.title}
+                                onChange={(e) => {
+                                  const updated = { ...cmsContent };
+                                  updated.posts[index].title = e.target.value;
+                                  setCmsContent(updated);
+                                }}
+                                className="font-semibold text-xs h-8"
+                              />
+                            </div>
+
+                            <div className="space-y-1">
+                              <label className="text-[10px] uppercase tracking-wider text-muted-foreground font-bold">Excerpt Summary</label>
+                              <Textarea
+                                value={post.excerpt}
+                                onChange={(e) => {
+                                  const updated = { ...cmsContent };
+                                  updated.posts[index].excerpt = e.target.value;
+                                  setCmsContent(updated);
+                                }}
+                                rows={2}
+                                className="text-xs"
+                              />
+                            </div>
+                          </div>
+                        ))}
                       </div>
                     </div>
-                    <div className="space-y-2">
-                      <label className="text-xs uppercase tracking-wider text-muted-foreground font-semibold flex items-center gap-1">
-                        <MapPin className="h-3.5 w-3.5 opacity-60" /> Address Location
-                      </label>
-                      <Input
-                        value={cmsContent.contact.address}
-                        onChange={(e) => {
-                          const updated = { ...cmsContent };
-                          updated.contact.address = e.target.value;
-                          setCmsContent(updated);
-                        }}
-                      />
-                    </div>
-                  </div>
+                  )}
 
-                  {/* Blog posts list editing */}
-                  <div className="rounded-xl border border-border bg-card p-6 shadow-card space-y-6">
-                    <div className="flex justify-between items-center border-b border-border pb-3">
-                      <h3 className="font-display text-xl font-bold flex items-center gap-2">
-                        <FileText className="h-5 w-5 text-accent" /> Manage Blog Articles
-                      </h3>
-                      <Button
-                        size="xs"
-                        variant="accent"
-                        onClick={() => {
-                          const updated = { ...cmsContent };
-                          const newId = `post-${Date.now()}`;
-                          updated.posts.push({
-                            id: newId,
-                            tag: "Kategorie",
-                            title: "Neuer Blog-Titel",
-                            excerpt: "Zusammenfassung des Artikels...",
-                            date: new Date().toLocaleDateString("de-DE", { month: "long", year: "numeric" }),
-                            read: "5 Min. Lesezeit"
-                          });
-                          setCmsContent(updated);
-                          toast.info("Added new blog draft. Don't forget to Save!");
-                        }}
-                        className="gap-1 cursor-pointer font-bold text-xs px-3 h-8 rounded-full"
-                      >
-                        <Plus className="h-3.5 w-3.5" /> Add Post
-                      </Button>
-                    </div>
-
-                    <div className="space-y-6">
-                      {cmsContent.posts.map((post, index) => (
-                        <div key={post.id} className="relative p-5 border border-border bg-muted/10 rounded-xl space-y-4">
-                          <button
-                            onClick={() => {
-                              const updated = { ...cmsContent };
-                              updated.posts.splice(index, 1);
-                              setCmsContent(updated);
-                              toast.warning("Deleted blog draft. Save to apply.");
-                            }}
-                            className="absolute top-4 right-4 text-muted-foreground hover:text-destructive cursor-pointer transition-colors"
-                            title="Delete Article"
-                          >
-                            <Trash2 className="h-4.5 w-4.5" />
-                          </button>
-
-                          <div className="grid gap-4 sm:grid-cols-3">
-                            <div className="space-y-1">
-                              <label className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Category Tag</label>
-                              <Input
-                                value={post.tag}
-                                onChange={(e) => {
-                                  const updated = { ...cmsContent };
-                                  updated.posts[index].tag = e.target.value;
-                                  setCmsContent(updated);
-                                }}
-                                className="h-8 text-xs font-semibold"
-                              />
-                            </div>
-                            <div className="space-y-1">
-                              <label className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Publish Date</label>
-                              <Input
-                                value={post.date}
-                                onChange={(e) => {
-                                  const updated = { ...cmsContent };
-                                  updated.posts[index].date = e.target.value;
-                                  setCmsContent(updated);
-                                }}
-                                className="h-8 text-xs"
-                              />
-                            </div>
-                            <div className="space-y-1">
-                              <label className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Read Time</label>
-                              <Input
-                                value={post.read}
-                                onChange={(e) => {
-                                  const updated = { ...cmsContent };
-                                  updated.posts[index].read = e.target.value;
-                                  setCmsContent(updated);
-                                }}
-                                className="h-8 text-xs"
-                              />
-                            </div>
-                          </div>
-
-                          <div className="space-y-1">
-                            <label className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Article Title</label>
-                            <Input
-                              value={post.title}
-                              onChange={(e) => {
-                                const updated = { ...cmsContent };
-                                updated.posts[index].title = e.target.value;
-                                setCmsContent(updated);
-                              }}
-                              className="font-medium text-sm"
-                            />
-                          </div>
-
-                          <div className="space-y-1">
-                            <label className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Excerpt Summary</label>
-                            <Textarea
-                              value={post.excerpt}
-                              onChange={(e) => {
-                                const updated = { ...cmsContent };
-                                updated.posts[index].excerpt = e.target.value;
-                                setCmsContent(updated);
-                              }}
-                              rows={2}
-                              className="text-xs"
-                            />
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-
-                {/* Save Bar side panel */}
-                <div className="rounded-xl border border-border bg-card p-6 shadow-card h-fit space-y-4">
-                  <h3 className="font-display text-xl font-bold">Publish Editor</h3>
-                  <p className="text-xs text-muted-foreground leading-relaxed">
-                    Click the save button below to publish your changes. This will instantly update the landing page hero, metrics, blog posts, and contact fields.
-                  </p>
-                  
-                  <div className="border-t border-border pt-4">
-                    <Button onClick={handleSaveCMS} className="w-full gap-2 cursor-pointer flex items-center justify-center h-11">
-                      <Save className="h-4.5 w-4.5" /> Save & Publish
-                    </Button>
-                  </div>
                 </div>
               </div>
             )}

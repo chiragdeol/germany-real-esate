@@ -7,6 +7,8 @@ export interface CMSContent {
     title: string;
     subtitle: string;
     videoUrl?: string;
+    bgType?: "video" | "image";
+    imageUrl?: string;
     stats: Array<{ value: string; label: string }>;
   };
   videos?: {
@@ -29,6 +31,27 @@ export interface CMSContent {
     date: string;
     read: string;
   }>;
+  projectTypesList?: Array<{
+    title: string;
+    copy: string;
+    icon: string;
+  }>;
+  homepageServices?: Array<{
+    title: string;
+    copy: string;
+    icon: string;
+  }>;
+  pricingTiers?: Array<{
+    title: string;
+    copy: string;
+  }>;
+  about?: {
+    title: string;
+    introTitle: string;
+    introText1: string;
+    introText2: string;
+    projectTypes: string[];
+  };
 }
 
 const DEFAULT_CONTENT: CMSContent = {
@@ -36,6 +59,8 @@ const DEFAULT_CONTENT: CMSContent = {
     title: "Städtische Projekte mit privaten Investoren finanzieren.",
     subtitle: "Banken · Family Offices · Fondsgesellschaften — national und international. Für Infrastruktur, Schulen, Kindergärten und Quartiere. Persönlich vermittelt, kein automatisches Matching, keine Listing-Fee.",
     videoUrl: "",
+    bgType: "video",
+    imageUrl: "",
     stats: [
       { value: "3.000+", label: "Investoren & Banken" },
       { value: "0,5 %", label: "Provision p.a." },
@@ -80,7 +105,38 @@ const DEFAULT_CONTENT: CMSContent = {
       date: "Januar 2026",
       read: "5 Min. Lesezeit"
     }
-  ]
+  ],
+  projectTypesList: [
+    { title: "Infrastruktur", copy: "Mittelgroße deutsche Städte haben massiven Nachholbedarf bei Straßen, Brücken, Datacentern und Glasfaser.", icon: "Building2" },
+    { title: "Energie & Umwelt", copy: "Finanzierung von Windparks, Solaranlagen, Fernwärmenetzen und Batteriespeichern direkt auf kommunaler Ebene.", icon: "Zap" },
+    { title: "Bildung & Soziales", copy: "Neubau und Sanierung von Schulen, Kindergärten und Sportstätten durch langfristiges, geduldiges Kapital.", icon: "GraduationCap" },
+    { title: "Quartiere & Wohnungsbau", copy: "Entwicklung neuer Wohngebiete und sozialer Wohnungsbau in Kooperation mit kommunalen Wohnungsgesellschaften.", icon: "Hammer" }
+  ],
+  homepageServices: [
+    { title: "Projektberatung", copy: "Unsere Experten besprechen Ihr Projekt mit Ihnen und entwickeln die passende Strategie, um Investoren anzuziehen.", icon: "Compass" },
+    { title: "Strukturierte Finanzierung", copy: "Meist gibt es mehrere Finanzierungsmöglichkeiten. Wir beraten Sie bei der optimalen Strukturierung.", icon: "Layers" },
+    { title: "Investoren-Matching", copy: "Mit Zugang zu weit über 3.000 Investoren und Banken. Auch ohne öffentliche Platzierung „matchen“ wir Sie manuell mit passenden Investoren.", icon: "Users" }
+  ],
+  pricingTiers: [
+    { title: "Für Kapitalgeber", copy: "Für institutionelle, angemeldete Investoren ist unsere Dienstleistung kostenfrei." },
+    { title: "Für Städte & Gemeinden", copy: "Das reine Listing Ihrer Projekte ist kostenfrei. Im Erfolgsfall fällt eine geringe Provision von 0,5 % des eingeworbenen Kapitals pro Jahr an." },
+    { title: "Beratungsgespräche", copy: "Konkrete Einzelberatung können Sie online buchen – 298 € pro Stunde." },
+    { title: "Einzelansprache & Club Deals", copy: "Diskrete Einzelansprache und Club-Deal-Strukturierung nach gesonderter Absprache." }
+  ],
+  about: {
+    title: "Wie funktioniert es genau?",
+    introTitle: "Sie bleiben in Kontrolle",
+    introText1: "Sie entscheiden, ob Ihr Projekt mit allen Daten oder anonymisiert gelistet wird und welche Informationen Sie bekannt geben möchten. Wir pflegen alle Angaben ein und warten auf Ihre Freigabe – erst dann wird das Projekt platziert.",
+    introText2: "Anfragen von Investoren leiten wir direkt an Sie weiter. Sie entscheiden, mit welchem Investor Sie zusammenarbeiten möchten, und informieren uns, sobald Sie einen Finanzierungspartner gefunden haben oder die Platzierung beenden möchten. Wir nehmen kein Kapital entgegen, sondern stellen Ihnen geeignete Investorenkontakte zur Verfügung.",
+    projectTypes: [
+      "Infrastruktur: Straßen, Brücken, Datacenter, Häfen, Glasfaser",
+      "Stadtentwicklung: neue Wohngebiete & sozialer Wohnungsbau",
+      "Energie: Wind, Solar, Batteriespeicher",
+      "Städtische Einrichtungen: Schulen, Kindergärten",
+      "Öffentlich-private Partnerschaften (ÖPP)",
+      "Tourismus, Kultur & öffentliche Mobilität"
+    ]
+  }
 };
 
 // HELPER: GET CURRENT CMS CONTENT

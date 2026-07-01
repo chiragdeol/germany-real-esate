@@ -10,7 +10,9 @@ const DEFAULT_CONTENT = {
   hero: {
     title: "Städtische Projekte mit privaten Investoren finanzieren.",
     subtitle: "Banken · Family Offices · Fondsgesellschaften — national und international. Für Infrastruktur, Schulen, Kindergärten und Quartiere. Persönlich vermittelt, kein automatisches Matching, keine Listing-Fee.",
-    videoUrl: "", // Hero video link
+    videoUrl: "",
+    bgType: "video",
+    imageUrl: "",
     stats: [
       { value: "3.000+", label: "Investoren & Banken" },
       { value: "0,5 %", label: "Provision p.a." },
@@ -19,8 +21,8 @@ const DEFAULT_CONTENT = {
     ]
   },
   videos: {
-    cityVideoUrl: "", // Explanatory video for cities
-    investorVideoUrl: "", // Explanatory video for investors
+    cityVideoUrl: "",
+    investorVideoUrl: ""
   },
   contact: {
     email: "kontakt@stadtfinanzen.de",
@@ -55,7 +57,38 @@ const DEFAULT_CONTENT = {
       date: "Januar 2026",
       read: "5 Min. Lesezeit"
     }
-  ]
+  ],
+  projectTypesList: [
+    { title: "Infrastruktur", copy: "Mittelgroße deutsche Städte haben massiven Nachholbedarf bei Straßen, Brücken, Datacentern und Glasfaser.", icon: "Building2" },
+    { title: "Energie & Umwelt", copy: "Finanzierung von Windparks, Solaranlagen, Fernwärmenetzen und Batteriespeichern direkt auf kommunaler Ebene.", icon: "Zap" },
+    { title: "Bildung & Soziales", copy: "Neubau und Sanierung von Schulen, Kindergärten und Sportstätten durch langfristiges, geduldiges Kapital.", icon: "GraduationCap" },
+    { title: "Quartiere & Wohnungsbau", copy: "Entwicklung neuer Wohngebiete und sozialer Wohnungsbau in Kooperation mit kommunalen Wohnungsgesellschaften.", icon: "Hammer" }
+  ],
+  homepageServices: [
+    { title: "Projektberatung", copy: "Unsere Experten besprechen Ihr Projekt mit Ihnen und entwickeln die passende Strategie, um Investoren anzuziehen.", icon: "Compass" },
+    { title: "Strukturierte Finanzierung", copy: "Meist gibt es mehrere Finanzierungsmöglichkeiten. Wir beraten Sie bei der optimalen Strukturierung.", icon: "Layers" },
+    { title: "Investoren-Matching", copy: "Mit Zugang zu weit über 3.000 Investoren und Banken. Auch ohne öffentliche Platzierung „matchen“ wir Sie manuell mit passenden Investoren.", icon: "Users" }
+  ],
+  pricingTiers: [
+    { title: "Für Kapitalgeber", copy: "Für institutionelle, angemeldete Investoren ist unsere Dienstleistung kostenfrei." },
+    { title: "Für Städte & Gemeinden", copy: "Das reine Listing Ihrer Projekte ist kostenfrei. Im Erfolgsfall fällt eine geringe Provision von 0,5 % des eingeworbenen Kapitals pro Jahr an." },
+    { title: "Beratungsgespräche", copy: "Konkrete Einzelberatung können Sie online buchen – 298 € pro Stunde." },
+    { title: "Einzelansprache & Club Deals", copy: "Diskrete Einzelansprache und Club-Deal-Strukturierung nach gesonderter Absprache." }
+  ],
+  about: {
+    title: "Wie funktioniert es genau?",
+    introTitle: "Sie bleiben in Kontrolle",
+    introText1: "Sie entscheiden, ob Ihr Projekt mit allen Daten oder anonymisiert gelistet wird und welche Informationen Sie bekannt geben möchten. Wir pflegen alle Angaben ein und warten auf Ihre Freigabe – erst dann wird das Projekt platziert.",
+    introText2: "Anfragen von Investoren leiten wir direkt an Sie weiter. Sie entscheiden, mit welchem Investor Sie zusammenarbeiten möchten, und informieren uns, sobald Sie einen Finanzierungspartner gefunden haben oder die Platzierung beenden möchten. Wir nehmen kein Kapital entgegen, sondern stellen Ihnen geeignete Investorenkontakte zur Verfügung.",
+    projectTypes: [
+      "Infrastruktur: Straßen, Brücken, Datacenter, Häfen, Glasfaser",
+      "Stadtentwicklung: neue Wohngebiete & sozialer Wohnungsbau",
+      "Energie: Wind, Solar, Batteriespeicher",
+      "Städtische Einrichtungen: Schulen, Kindergärten",
+      "Öffentlich-private Partnerschaften (ÖPP)",
+      "Tourismus, Kultur & öffentliche Mobilität"
+    ]
+  }
 };
 
 function initContentFile() {
@@ -94,23 +127,25 @@ export const Route = createFileRoute("/api/content")({
               read: row.read_time
             }));
 
-            // Reconstruct JSON from DB values
-            const heroStatsRaw = settingsMap.get("hero_stats");
-            let stats = DEFAULT_CONTENT.hero.stats;
-            if (heroStatsRaw) {
+            // Helpers to parse JSON fields safely
+            const parseJsonField = (key: string, fallback: any) => {
+              const raw = settingsMap.get(key);
+              if (!raw) return fallback;
               try {
-                stats = JSON.parse(heroStatsRaw);
+                return JSON.parse(raw);
               } catch (e) {
-                // ignore
+                return fallback;
               }
-            }
+            };
 
             const dbContent = {
               hero: {
                 title: settingsMap.get("hero_title") || DEFAULT_CONTENT.hero.title,
                 subtitle: settingsMap.get("hero_subtitle") || DEFAULT_CONTENT.hero.subtitle,
                 videoUrl: settingsMap.get("hero_video_url") || "",
-                stats
+                bgType: settingsMap.get("hero_bg_type") || "video",
+                imageUrl: settingsMap.get("hero_image_url") || "",
+                stats: parseJsonField("hero_stats", DEFAULT_CONTENT.hero.stats)
               },
               videos: {
                 cityVideoUrl: settingsMap.get("video_city_url") || "",
@@ -124,7 +159,19 @@ export const Route = createFileRoute("/api/content")({
               blog: {
                 title: settingsMap.get("blog_title") || DEFAULT_CONTENT.blog.title
               },
-              posts
+              posts: posts.length > 0 ? posts : DEFAULT_CONTENT.posts,
+              
+              // Expanded fields
+              projectTypesList: parseJsonField("project_types_list", DEFAULT_CONTENT.projectTypesList),
+              homepageServices: parseJsonField("homepage_services", DEFAULT_CONTENT.homepageServices),
+              pricingTiers: parseJsonField("pricing_tiers", DEFAULT_CONTENT.pricingTiers),
+              about: {
+                title: settingsMap.get("about_title") || DEFAULT_CONTENT.about.title,
+                introTitle: settingsMap.get("about_intro_title") || DEFAULT_CONTENT.about.introTitle,
+                introText1: settingsMap.get("about_intro_text1") || DEFAULT_CONTENT.about.introText1,
+                introText2: settingsMap.get("about_intro_text2") || DEFAULT_CONTENT.about.introText2,
+                projectTypes: parseJsonField("about_project_types", DEFAULT_CONTENT.about.projectTypes)
+              }
             };
 
             return new Response(JSON.stringify(dbContent), {
@@ -162,7 +209,6 @@ export const Route = createFileRoute("/api/content")({
           const pool = getDbPool();
           if (pool) {
             try {
-              // Helper to insert settings
               const saveSetting = async (key: string, value: string) => {
                 await pool.query(
                   "INSERT INTO site_settings (setting_key, setting_value) VALUES (?, ?) ON DUPLICATE KEY UPDATE setting_value = ?",
@@ -174,6 +220,8 @@ export const Route = createFileRoute("/api/content")({
               await saveSetting("hero_title", newContent.hero.title || "");
               await saveSetting("hero_subtitle", newContent.hero.subtitle || "");
               await saveSetting("hero_video_url", newContent.hero.videoUrl || "");
+              await saveSetting("hero_bg_type", newContent.hero.bgType || "video");
+              await saveSetting("hero_image_url", newContent.hero.imageUrl || "");
               await saveSetting("video_city_url", newContent.videos?.cityVideoUrl || "");
               await saveSetting("video_investor_url", newContent.videos?.investorVideoUrl || "");
               await saveSetting("contact_email", newContent.contact.email || "");
@@ -181,8 +229,19 @@ export const Route = createFileRoute("/api/content")({
               await saveSetting("contact_address", newContent.contact.address || "");
               await saveSetting("blog_title", newContent.blog.title || "");
               await saveSetting("hero_stats", JSON.stringify(newContent.hero.stats || []));
+              
+              // Save expanded settings
+              await saveSetting("project_types_list", JSON.stringify(newContent.projectTypesList || []));
+              await saveSetting("homepage_services", JSON.stringify(newContent.homepageServices || []));
+              await saveSetting("pricing_tiers", JSON.stringify(newContent.pricingTiers || []));
+              
+              await saveSetting("about_title", newContent.about?.title || "");
+              await saveSetting("about_intro_title", newContent.about?.introTitle || "");
+              await saveSetting("about_intro_text1", newContent.about?.introText1 || "");
+              await saveSetting("about_intro_text2", newContent.about?.introText2 || "");
+              await saveSetting("about_project_types", JSON.stringify(newContent.about?.projectTypes || []));
 
-              // Save blog posts (clear and reload in a transaction-like sequence)
+              // Save blog posts
               await pool.query("DELETE FROM blog_posts");
               if (Array.isArray(newContent.posts)) {
                 for (const post of newContent.posts) {

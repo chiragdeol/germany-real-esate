@@ -51,6 +51,24 @@ function getEmbedUrl(url: string): { type: "iframe" | "video"; url: string } {
   return { type: "video", url };
 }
 
+const iconMap: Record<string, any> = {
+  Building2,
+  Zap,
+  GraduationCap,
+  Hammer,
+  Compass,
+  Layers,
+  Users,
+  ShieldCheck,
+  Handshake,
+  Sparkles
+};
+
+function getIcon(name: string) {
+  const Icon = iconMap[name];
+  return Icon || Building2;
+}
+
 function HomePage() {
   const [content, setContent] = useState<CMSContent | null>(null);
   const [playingVideoUrl, setPlayingVideoUrl] = useState<string | null>(null);
@@ -62,11 +80,11 @@ function HomePage() {
   return (
     <>
       <Hero content={content} />
-      <ProjectTypes />
+      <ProjectTypes content={content} />
       <HowItWorks />
       <WhyUs />
-      <Services />
-      <Pricing />
+      <Services content={content} />
+      <Pricing content={content} />
       <Videos content={content} onPlay={setPlayingVideoUrl} />
       <CTASection />
 
@@ -119,16 +137,24 @@ function Hero({ content }: { content: CMSContent | null }) {
 
   return (
     <section className="relative isolate overflow-hidden">
-      <video
-        src={content?.hero.videoUrl || heroVideo.url}
-        key={content?.hero.videoUrl || heroVideo.url}
-        poster={heroCity}
-        autoPlay
-        loop
-        muted
-        playsInline
-        className="absolute inset-0 -z-10 h-full w-full object-cover"
-      />
+      {content?.hero.bgType === "image" && content?.hero.imageUrl ? (
+        <img
+          src={content.hero.imageUrl}
+          alt="Hero Background"
+          className="absolute inset-0 -z-10 h-full w-full object-cover"
+        />
+      ) : (
+        <video
+          src={content?.hero.videoUrl || heroVideo.url}
+          key={content?.hero.videoUrl || heroVideo.url}
+          poster={heroCity}
+          autoPlay
+          loop
+          muted
+          playsInline
+          className="absolute inset-0 -z-10 h-full w-full object-cover"
+        />
+      )}
       <div className="absolute inset-0 -z-10 bg-primary/70" />
       <div className="mx-auto grid max-w-7xl gap-10 px-6 py-28 md:py-40 text-primary-foreground">
         <div className="max-w-3xl">
@@ -230,25 +256,30 @@ function WhyUs() {
   );
 }
 
-function ProjectTypes() {
-  const items = [
-    { Icon: Hammer, title: "Infrastruktur", copy: "Straßenbau, Brückenbau, Datacenter, Flughäfen, Häfen, Bahnhöfe, Einkaufsstraßen, Glasfaser." },
-    { Icon: Layers, title: "Stadtentwicklung", copy: "Neue Wohngebiete, sozialer Wohnungsbau, Quartiersentwicklung." },
-    { Icon: Zap, title: "Energie", copy: "Wind, Solar, Batteriespeicher und weitere Erzeugungs- und Speicherprojekte." },
-    { Icon: GraduationCap, title: "Städtische Einrichtungen", copy: "Schulen, Kindergärten und soziale Einrichtungen." },
+function ProjectTypes({ content }: { content: CMSContent | null }) {
+  const defaultItems = [
+    { icon: "Hammer", title: "Infrastruktur", copy: "Straßenbau, Brückenbau, Datacenter, Flughäfen, Häfen, Bahnhöfe, Einkaufsstraßen, Glasfaser." },
+    { icon: "Layers", title: "Stadtentwicklung", copy: "Neue Wohngebiete, sozialer Wohnungsbau, Quartiersentwicklung." },
+    { icon: "Zap", title: "Energie", copy: "Wind, Solar, Batteriespeicher und weitere Erzeugungs- und Speicherprojekte." },
+    { icon: "GraduationCap", title: "Städtische Einrichtungen", copy: "Schulen, Kindergärten und soziale Einrichtungen." },
   ];
+  const items = content?.projectTypesList || defaultItems;
+
   return (
     <section className="border-b border-border bg-secondary/40 py-24">
       <div className="mx-auto max-w-7xl px-6">
         <SectionHeading eyebrow="Projekttypen" title="Diese Projekte können Sie platzieren." />
         <div className="mt-12 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
-          {items.map(({ Icon, title, copy }) => (
-            <div key={title} className="bg-card p-6 shadow-[var(--shadow-card)]">
-              <Icon className="h-8 w-8 text-accent" />
-              <h3 className="mt-5 font-display text-xl text-foreground">{title}</h3>
-              <p className="mt-2 text-sm text-muted-foreground">{copy}</p>
-            </div>
-          ))}
+          {items.map((item, i) => {
+            const Icon = getIcon(item.icon);
+            return (
+              <div key={i} className="bg-card p-6 shadow-[var(--shadow-card)]">
+                <Icon className="h-8 w-8 text-accent" />
+                <h3 className="mt-5 font-display text-xl text-foreground">{item.title}</h3>
+                <p className="mt-2 text-sm text-muted-foreground">{item.copy}</p>
+              </div>
+            );
+          })}
         </div>
         <p className="mt-12 max-w-3xl text-sm text-muted-foreground">
           <strong className="text-foreground">Erstklassige Opportunitäten für institutionelle Investoren.</strong>{" "}
@@ -262,37 +293,44 @@ function ProjectTypes() {
   );
 }
 
-function Services() {
-  const items = [
-    { Icon: Compass, title: "Projektberatung", copy: "Unsere Experten besprechen Ihr Projekt mit Ihnen und entwickeln die passende Strategie, um Investoren anzuziehen." },
-    { Icon: Layers, title: "Strukturierte Finanzierung", copy: "Meist gibt es mehrere Finanzierungsmöglichkeiten. Wir beraten Sie bei der optimalen Strukturierung." },
-    { Icon: Users, title: "Investoren-Matching", copy: "Mit Zugang zu weit über 3.000 Investoren und Banken. Auch ohne öffentliche Platzierung „matchen“ wir Sie manuell mit passenden Investoren." },
+function Services({ content }: { content: CMSContent | null }) {
+  const defaultItems = [
+    { icon: "Compass", title: "Projektberatung", copy: "Unsere Experten besprechen Ihr Projekt mit Ihnen und entwickeln die passende Strategie, um Investoren anzuziehen." },
+    { icon: "Layers", title: "Strukturierte Finanzierung", copy: "Meist gibt es mehrere Finanzierungsmöglichkeiten. Wir beraten Sie bei der optimalen Strukturierung." },
+    { icon: "Users", title: "Investoren-Matching", copy: "Mit Zugang zu weit über 3.000 Investoren und Banken. Auch ohne öffentliche Platzierung „matchen“ wir Sie manuell mit passenden Investoren." },
   ];
+  const items = content?.homepageServices || defaultItems;
+
   return (
     <section className="bg-background py-24">
       <div className="mx-auto max-w-7xl px-6">
         <SectionHeading eyebrow="Unsere Leistungen" title="Sie möchten mehr oder brauchen weitere Unterstützung?" />
         <div className="mt-12 grid gap-10 md:grid-cols-3">
-          {items.map(({ Icon, title, copy }) => (
-            <div key={title} className="border-t border-border pt-6">
-              <Icon className="h-6 w-6 text-accent" />
-              <h3 className="mt-4 font-display text-xl text-foreground">{title}</h3>
-              <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{copy}</p>
-            </div>
-          ))}
+          {items.map((item, i) => {
+            const Icon = getIcon(item.icon);
+            return (
+              <div key={i} className="border-t border-border pt-6">
+                <Icon className="h-6 w-6 text-accent" />
+                <h3 className="mt-4 font-display text-xl text-foreground">{item.title}</h3>
+                <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{item.copy}</p>
+              </div>
+            );
+          })}
         </div>
       </div>
     </section>
   );
 }
 
-function Pricing() {
-  const tiers = [
+function Pricing({ content }: { content: CMSContent | null }) {
+  const defaultTiers = [
     { title: "Für Kapitalgeber", copy: "Für institutionelle, angemeldete Investoren ist unsere Dienstleistung kostenfrei." },
     { title: "Für Städte & Gemeinden", copy: "Das reine Listing Ihrer Projekte ist kostenfrei. Im Erfolgsfall fällt eine geringe Provision von 0,5 % des eingeworbenen Kapitals pro Jahr an." },
     { title: "Beratungsgespräche", copy: "Konkrete Einzelberatung können Sie online buchen – 298 € pro Stunde." },
     { title: "Einzelansprache & Club Deals", copy: "Diskrete Einzelansprache ausgewählter Investoren und Club-Deal-Strukturierung nach gesonderter Absprache." },
   ];
+  const tiers = content?.pricingTiers || defaultTiers;
+
   return (
     <section className="border-y border-border bg-secondary/40 py-24">
       <div className="mx-auto max-w-7xl px-6">
@@ -302,8 +340,8 @@ function Pricing() {
           Höhe von 0,5 % des eingeworbenen Kapitals pro Jahr.
         </p>
         <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          {tiers.map((t) => (
-            <div key={t.title} className="bg-card p-6 shadow-[var(--shadow-card)]">
+          {tiers.map((t, i) => (
+            <div key={i} className="bg-card p-6 shadow-[var(--shadow-card)]">
               <div className="text-xs uppercase tracking-[0.2em] text-accent">{t.title}</div>
               <p className="mt-4 text-sm leading-relaxed text-muted-foreground">{t.copy}</p>
             </div>
