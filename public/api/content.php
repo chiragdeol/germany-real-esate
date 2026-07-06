@@ -10,7 +10,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 
 require_once __DIR__ . '/db.php';
 
-// Polyfill getallheaders if it does not exist
 if (!function_exists('getallheaders')) {
   function getallheaders() {
     $headers = [];
@@ -25,6 +24,7 @@ if (!function_exists('getallheaders')) {
 
 // Default content fallback structure
 $defaultContent = [
+  "headerScripts" => "",
   "hero" => [
     "title" => "Städtische Projekte mit privaten Investoren finanzieren.",
     "subtitle" => "Banken · Family Offices · Fondsgesellschaften — national und international. Für Infrastruktur, Schulen, Kindergärten und Quartiere. Persönlich vermittelt, kein automatisches Matching, keine Listing-Fee.",
@@ -42,6 +42,12 @@ $defaultContent = [
     "cityVideoUrl" => "",
     "investorVideoUrl" => ""
   ],
+  "videoSectionTexts" => [
+    "cityTitle" => "Für Städte & Kommunen",
+    "cityCopy" => "Wie Sie über Stadtfinanzen.de seriöses Kapital ansprechen, ohne sensible Details öffentlich preiszugeben.",
+    "investorTitle" => "Für Investoren",
+    "investorCopy" => "Wie institutionelle Investoren frühzeitig Zugang zu kuratierten Off-Market-Projekten in Deutschland und Europa erhalten."
+  ],
   "contact" => [
     "email" => "kontakt@stadtfinanzen.de",
     "phone" => "+49 (0) 30 555 01 20",
@@ -56,6 +62,7 @@ $defaultContent = [
       "tag" => "Stadtentwicklung",
       "title" => "Warum mittelgroße deutsche Städte zur nächsten institutionellen Assetklasse werden",
       "excerpt" => "Mittelstädte in Deutschland liefern auf risikoadjustierter Basis zunehmend bessere Renditen als die Metropolen. Was wir in unserer Pipeline sehen.",
+      "content" => "Die Attraktivität von Mittelstädten (sogenannten B- und C-Standorten) wächst stetig. Während A-Metropolen wie Berlin, München oder Hamburg unter extrem niedrigen Renditen und hoher Regulierung leiden, bieten mittelgroße deutsche Städte ein stabiles wirtschaftliches Fundament mit deutlich attraktiveren Renditechancen.\n\n### Wachsende Nachfrage nach regionaler Infrastruktur\nKommunen abseits der Metropolen stehen vor großen Herausforderungen. Von der Sanierung öffentlicher Schulen bis hin zur Modernisierung von Verkehrswegen und Glasfasernetzen ist der Investitionsbedarf gigantisch. Da klassische Bankkredite durch regulatorische Hürden oft schwer zugänglich sind, gewinnen private Finanzierungspartnerschaften (ÖPP) an Bedeutung.\n\n### Vorteile für institutionelle Investoren:\n1. **Geringere Volatilität**: Die Mietmärkte und Immobilienwerte in mittleren Städten sind historisch stabiler.\n2. **Höhere Renditespreads**: Renditen liegen oft 1,0 bis 2,5 % über denen der Metropolen.\n3. **Partnerschaftliche Kooperation**: Kommunen zeigen sich bei Projektentwicklungen oft kooperativer und flexibler.",
       "date" => "März 2026",
       "read" => "6 Min. Lesezeit"
     ],
@@ -64,6 +71,7 @@ $defaultContent = [
       "tag" => "Energie & Infrastruktur",
       "title" => "Geduldiges Kapital für kommunale Erneuerbare",
       "excerpt" => "Wie langfristige Infrastrukturmandate und EU-Förderinstrumente die Finanzierung der Energiewende auf kommunaler Ebene verändern.",
+      "content" => "Kommunale Energieversorgung ist der Schlüssel zur Energiewende in Deutschland. Windparks, Solaranlagen und Fernwärmenetze erfordern jedoch erhebliche Vorabinvestitionen, die kommunale Haushalte allein nicht tragen können. Hier kommt sogenanntes „geduldiges Kapital“ ins Spiel.\n\n### Was ist geduldiges Kapital?\nGeduldiges Kapital beschreibt langfristig orientierte Investitionen, meist von Pensionskassen, Versicherungsgesellschaften oder Stiftungen. Diese Akteure suchen keine schnellen Spekulationsgewinne, sondern stabile, inflationsgeschützte Erträge über 15 bis 30 Jahre.\n\n### Kommunen profitieren doppelt:\n* **Planungssicherheit**: Langfristige Zinsbindungen und feste Abnahmeverträge schaffen verlässliche Haushaltsposten.\n* **Technologie-Vorsprung**: Investoren finanzieren oft modernste Speichertechnologien (Batterien) und intelligente Stromnetze gleich mit.",
       "date" => "Februar 2026",
       "read" => "8 Min. Lesezeit"
     ],
@@ -72,6 +80,7 @@ $defaultContent = [
       "tag" => "Öffentlich-private Partnerschaft",
       "title" => "ÖPP-Strukturen, die wirklich zur Unterschrift führen",
       "excerpt" => "Ein kompakter Leitfaden für Kämmerer und Stadträte zu Strukturen, die vom MoU bis zur Signatur tragen, ohne Marktvertrauen zu verspielen.",
+      "content" => "Öffentlich-Private Partnerschaften (ÖPP) gelten oft als bürokratisch und schwerfällig. Doch richtig strukturiert sind sie ein mächtiges Werkzeug, um öffentliche Projekte schneller und budgetkonformer umzusetzen.\n\n### Der Weg zum erfolgreichen Vertragsabschluss\nEin häufiger Fehler liegt in mangelhafter Vorbereitung. Eine klare Definition der Risikoverteilung zwischen öffentlicher Hand und privatem Partner ist der wichtigste Baustein.\n\n### Die Phasen einer erfolgreichen ÖPP-Struktur:\n1. **Bedarfsanalyse**: Eindeutige Definition, was gebaut oder betrieben werden soll.\n2. **Letter of Intent (LoI) / MoU**: Frühzeitige Festlegung der Kernpunkte, um das Interesse qualifizierter Investoren zu sichern.\n3. **Transparente Ausschreibung**: Klare Kriterien und zügige Vergabeprozesse.\n4. **Risikoallokation**: Risiken wie Baukostenüberschreitungen sollten bei der Partei liegen, die sie am besten kontrollieren kann (meist dem privaten Baupartner).",
       "date" => "Januar 2026",
       "read" => "5 Min. Lesezeit"
     ]
@@ -106,6 +115,31 @@ $defaultContent = [
       "Öffentlich-private Partnerschaften (ÖPP)",
       "Tourismus, Kultur & öffentliche Mobilität"
     ]
+  ],
+  "homepageHowItWorks" => [
+    "title" => "In vier Schritten zur Finanzierung.",
+    "subtitle" => "Wie geht´s?",
+    "steps" => [
+      ["n" => "01", "title" => "Formular ausfüllen", "copy" => "Stellen Sie Ihr Projekt über unser Kontaktformular kurz vor – auch anonymisiert möglich."],
+      ["n" => "02", "title" => "Inhalte freigeben", "copy" => "Wir pflegen Ihre Angaben ein. Veröffentlicht wird erst nach Ihrer ausdrücklichen Freigabe."],
+      ["n" => "03", "title" => "Anfragen erhalten", "copy" => "Investorenanfragen leiten wir direkt an Sie weiter. Sie entscheiden, mit wem Sie sprechen."],
+      ["n" => "04", "title" => "Direkt verhandeln", "copy" => "Sie verhandeln Konditionen direkt mit dem Investor. Wir begleiten Sie bei der Finanzierung."]
+    ]
+  ],
+  "homepageWhyUs" => [
+    "title" => "Hier finden Sie Investoren.",
+    "subtitle" => "Ihre Vorteile",
+    "items" => [
+      ["icon" => "ShieldCheck", "title" => "Sie behalten die Kontrolle", "copy" => "Sie bestimmen, welche Informationen Sie bekannt geben – auf Wunsch auch vollständig anonym."],
+      ["icon" => "Handshake", "title" => "Kein automatisches Matching", "copy" => "Wir leiten Investoren direkt und persönlich an Sie weiter – keine Algorithmen, kein Massenversand."],
+      ["icon" => "Building2", "title" => "Keine Listing-Fee", "copy" => "Das Einstellen Ihres Projekts ist kostenfrei. Eine geringe Provision fällt nur im Erfolgsfall an."],
+      ["icon" => "Sparkles", "title" => "Persönliche Betreuung", "copy" => "Ein fester Ansprechpartner begleitet Sie von der Anfrage bis zur Finanzierungszusage."]
+    ]
+  ],
+  "homepageCta" => [
+    "title" => "Bereit für den nächsten Schritt?",
+    "subtitle" => "Kommunale Finanzierung modern, diskret und effizient. Registrieren Sie sich noch heute kostenlos.",
+    "buttonText" => "Projekt einreichen"
   ]
 ];
 
@@ -115,6 +149,12 @@ if ($method === 'GET') {
   $db = getDbConnection();
   if ($db) {
     try {
+      // Run database column migrations check
+      $check = $db->query("SHOW COLUMNS FROM blog_posts LIKE 'content'");
+      if ($check->rowCount() === 0) {
+        $db->query("ALTER TABLE blog_posts ADD COLUMN content LONGTEXT NOT NULL DEFAULT ''");
+      }
+
       // Fetch settings
       $stmt = $db->query("SELECT * FROM site_settings");
       $settingsRows = $stmt->fetchAll();
@@ -135,6 +175,7 @@ if ($method === 'GET') {
           "tag" => $row['tag'],
           "title" => $row['title'],
           "excerpt" => $row['excerpt'],
+          "content" => isset($row['content']) ? $row['content'] : "",
           "date" => $row['date_text'],
           "read" => $row['read_time']
         ];
@@ -149,6 +190,7 @@ if ($method === 'GET') {
 
       if (!empty($settingsMap)) {
         $dbContent = [
+          "headerScripts" => isset($settingsMap['header_scripts']) ? $settingsMap['header_scripts'] : "",
           "hero" => [
             "title" => isset($settingsMap['hero_title']) ? $settingsMap['hero_title'] : $defaultContent['hero']['title'],
             "subtitle" => isset($settingsMap['hero_subtitle']) ? $settingsMap['hero_subtitle'] : $defaultContent['hero']['subtitle'],
@@ -161,6 +203,7 @@ if ($method === 'GET') {
             "cityVideoUrl" => isset($settingsMap['video_city_url']) ? $settingsMap['video_city_url'] : "",
             "investorVideoUrl" => isset($settingsMap['video_investor_url']) ? $settingsMap['video_investor_url'] : ""
           ],
+          "videoSectionTexts" => $parseJson('video_section_texts', $defaultContent['videoSectionTexts']),
           "contact" => [
             "email" => isset($settingsMap['contact_email']) ? $settingsMap['contact_email'] : $defaultContent['contact']['email'],
             "phone" => isset($settingsMap['contact_phone']) ? $settingsMap['contact_phone'] : $defaultContent['contact']['phone'],
@@ -171,7 +214,6 @@ if ($method === 'GET') {
           ],
           "posts" => empty($posts) ? $defaultContent['posts'] : $posts,
           
-          // Expanded fields
           "projectTypesList" => $parseJson('project_types_list', $defaultContent['projectTypesList']),
           "homepageServices" => $parseJson('homepage_services', $defaultContent['homepageServices']),
           "pricingTiers" => $parseJson('pricing_tiers', $defaultContent['pricingTiers']),
@@ -181,7 +223,12 @@ if ($method === 'GET') {
             "introText1" => isset($settingsMap['about_intro_text1']) ? $settingsMap['about_intro_text1'] : $defaultContent['about']['introText1'],
             "introText2" => isset($settingsMap['about_intro_text2']) ? $settingsMap['about_intro_text2'] : $defaultContent['about']['introText2'],
             "projectTypes" => $parseJson('about_project_types', $defaultContent['about']['projectTypes'])
-          ]
+          ],
+          
+          // Layout variables
+          "homepageHowItWorks" => $parseJson('homepage_how_it_works', $defaultContent['homepageHowItWorks']),
+          "homepageWhyUs" => $parseJson('homepage_why_us', $defaultContent['homepageWhyUs']),
+          "homepageCta" => $parseJson('homepage_cta', $defaultContent['homepageCta'])
         ];
         
         echo json_encode($dbContent);
@@ -226,12 +273,19 @@ if ($method === 'POST') {
   $db = getDbConnection();
   if ($db) {
     try {
+      // Run database column migrations check
+      $check = $db->query("SHOW COLUMNS FROM blog_posts LIKE 'content'");
+      if ($check->rowCount() === 0) {
+        $db->query("ALTER TABLE blog_posts ADD COLUMN content LONGTEXT NOT NULL DEFAULT ''");
+      }
+
       // Helper to save settings
       $saveSetting = $db->prepare("
         INSERT INTO site_settings (setting_key, setting_value)
         VALUES (?, ?) ON DUPLICATE KEY UPDATE setting_value = ?
       ");
 
+      $saveSetting->execute(["header_scripts", isset($newContent['headerScripts']) ? $newContent['headerScripts'] : '', isset($newContent['headerScripts']) ? $newContent['headerScripts'] : '']);
       $saveSetting->execute(["hero_title", $newContent['hero']['title'], $newContent['hero']['title']]);
       $saveSetting->execute(["hero_subtitle", $newContent['hero']['subtitle'], $newContent['hero']['subtitle']]);
       $saveSetting->execute(["hero_video_url", isset($newContent['hero']['videoUrl']) ? $newContent['hero']['videoUrl'] : '', isset($newContent['hero']['videoUrl']) ? $newContent['hero']['videoUrl'] : '']);
@@ -247,7 +301,6 @@ if ($method === 'POST') {
       $statsJson = json_encode($newContent['hero']['stats'], JSON_UNESCAPED_UNICODE);
       $saveSetting->execute(["hero_stats", $statsJson, $statsJson]);
       
-      // Save expanded keys
       $projectTypesListJson = json_encode(isset($newContent['projectTypesList']) ? $newContent['projectTypesList'] : [], JSON_UNESCAPED_UNICODE);
       $saveSetting->execute(["project_types_list", $projectTypesListJson, $projectTypesListJson]);
       
@@ -272,12 +325,25 @@ if ($method === 'POST') {
       $aboutProjTypesJson = json_encode(isset($newContent['about']['projectTypes']) ? $newContent['about']['projectTypes'] : [], JSON_UNESCAPED_UNICODE);
       $saveSetting->execute(["about_project_types", $aboutProjTypesJson, $aboutProjTypesJson]);
 
+      // Layout variables
+      $videoSectionTextsJson = json_encode(isset($newContent['videoSectionTexts']) ? $newContent['videoSectionTexts'] : [], JSON_UNESCAPED_UNICODE);
+      $saveSetting->execute(["video_section_texts", $videoSectionTextsJson, $videoSectionTextsJson]);
+
+      $homepageHowItWorksJson = json_encode(isset($newContent['homepageHowItWorks']) ? $newContent['homepageHowItWorks'] : [], JSON_UNESCAPED_UNICODE);
+      $saveSetting->execute(["homepage_how_it_works", $homepageHowItWorksJson, $homepageHowItWorksJson]);
+
+      $homepageWhyUsJson = json_encode(isset($newContent['homepageWhyUs']) ? $newContent['homepageWhyUs'] : [], JSON_UNESCAPED_UNICODE);
+      $saveSetting->execute(["homepage_why_us", $homepageWhyUsJson, $homepageWhyUsJson]);
+
+      $homepageCtaJson = json_encode(isset($newContent['homepageCta']) ? $newContent['homepageCta'] : [], JSON_UNESCAPED_UNICODE);
+      $saveSetting->execute(["homepage_cta", $homepageCtaJson, $homepageCtaJson]);
+
       // Save blog posts
       $db->query("DELETE FROM blog_posts");
       if (isset($newContent['posts']) && is_array($newContent['posts'])) {
         $insertPost = $db->prepare("
-          INSERT INTO blog_posts (id, tag, title, excerpt, date_text, read_time)
-          VALUES (?, ?, ?, ?, ?, ?)
+          INSERT INTO blog_posts (id, tag, title, excerpt, content, date_text, read_time)
+          VALUES (?, ?, ?, ?, ?, ?, ?)
         ");
         foreach ($newContent['posts'] as $post) {
           $insertPost->execute([
@@ -285,6 +351,7 @@ if ($method === 'POST') {
             $post['tag'],
             $post['title'],
             $post['excerpt'],
+            isset($post['content']) ? $post['content'] : "",
             $post['date'],
             $post['read']
           ]);

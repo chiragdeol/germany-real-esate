@@ -15,6 +15,7 @@ import { Route as BlogRouteImport } from './routes/blog'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as BlogIdRouteImport } from './routes/blog.$id'
 import { Route as ApiLeadsRouteImport } from './routes/api/leads'
 import { Route as ApiContentRouteImport } from './routes/api/content'
 import { Route as ApiChatRouteImport } from './routes/api/chat'
@@ -49,6 +50,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const BlogIdRoute = BlogIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => BlogRoute,
+} as any)
 const ApiLeadsRoute = ApiLeadsRouteImport.update({
   id: '/api/leads',
   path: '/api/leads',
@@ -69,35 +75,38 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/admin': typeof AdminRoute
-  '/blog': typeof BlogRoute
+  '/blog': typeof BlogRouteWithChildren
   '/contact': typeof ContactRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/api/chat': typeof ApiChatRoute
   '/api/content': typeof ApiContentRoute
   '/api/leads': typeof ApiLeadsRoute
+  '/blog/$id': typeof BlogIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/admin': typeof AdminRoute
-  '/blog': typeof BlogRoute
+  '/blog': typeof BlogRouteWithChildren
   '/contact': typeof ContactRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/api/chat': typeof ApiChatRoute
   '/api/content': typeof ApiContentRoute
   '/api/leads': typeof ApiLeadsRoute
+  '/blog/$id': typeof BlogIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/admin': typeof AdminRoute
-  '/blog': typeof BlogRoute
+  '/blog': typeof BlogRouteWithChildren
   '/contact': typeof ContactRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/api/chat': typeof ApiChatRoute
   '/api/content': typeof ApiContentRoute
   '/api/leads': typeof ApiLeadsRoute
+  '/blog/$id': typeof BlogIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -111,6 +120,7 @@ export interface FileRouteTypes {
     | '/api/chat'
     | '/api/content'
     | '/api/leads'
+    | '/blog/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -122,6 +132,7 @@ export interface FileRouteTypes {
     | '/api/chat'
     | '/api/content'
     | '/api/leads'
+    | '/blog/$id'
   id:
     | '__root__'
     | '/'
@@ -133,13 +144,14 @@ export interface FileRouteTypes {
     | '/api/chat'
     | '/api/content'
     | '/api/leads'
+    | '/blog/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
   AdminRoute: typeof AdminRoute
-  BlogRoute: typeof BlogRoute
+  BlogRoute: typeof BlogRouteWithChildren
   ContactRoute: typeof ContactRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   ApiChatRoute: typeof ApiChatRoute
@@ -191,6 +203,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/blog/$id': {
+      id: '/blog/$id'
+      path: '/$id'
+      fullPath: '/blog/$id'
+      preLoaderRoute: typeof BlogIdRouteImport
+      parentRoute: typeof BlogRoute
+    }
     '/api/leads': {
       id: '/api/leads'
       path: '/api/leads'
@@ -215,11 +234,21 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface BlogRouteChildren {
+  BlogIdRoute: typeof BlogIdRoute
+}
+
+const BlogRouteChildren: BlogRouteChildren = {
+  BlogIdRoute: BlogIdRoute,
+}
+
+const BlogRouteWithChildren = BlogRoute._addFileChildren(BlogRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
   AdminRoute: AdminRoute,
-  BlogRoute: BlogRoute,
+  BlogRoute: BlogRouteWithChildren,
   ContactRoute: ContactRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   ApiChatRoute: ApiChatRoute,

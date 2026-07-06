@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { getContent, type CMSContent } from "@/lib/leads";
 
 export const Route = createFileRoute("/blog")({
@@ -53,9 +53,13 @@ function BlogPage() {
                 <div>
                   <h2 className="font-display text-3xl text-foreground md:text-4xl">{p.title}</h2>
                   <p className="mt-4 text-muted-foreground leading-relaxed">{p.excerpt}</p>
-                  <a href="#" className="mt-4 inline-block text-sm font-medium text-foreground underline-offset-4 hover:underline">
+                  <Link
+                    to="/blog/$id"
+                    params={{ id: p.id }}
+                    className="mt-4 inline-block text-sm font-medium text-foreground underline-offset-4 hover:underline cursor-pointer"
+                  >
                     Artikel lesen →
-                  </a>
+                  </Link>
                 </div>
               </article>
             ))

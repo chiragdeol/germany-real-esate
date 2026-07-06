@@ -81,12 +81,12 @@ function HomePage() {
     <>
       <Hero content={content} />
       <ProjectTypes content={content} />
-      <HowItWorks />
-      <WhyUs />
+      <HowItWorks content={content} />
+      <WhyUs content={content} />
       <Services content={content} />
       <Pricing content={content} />
       <Videos content={content} onPlay={setPlayingVideoUrl} />
-      <CTASection />
+      <CTASection content={content} />
 
       {playingVideoUrl && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 p-4 backdrop-blur-md transition-all">
@@ -199,17 +199,22 @@ function Hero({ content }: { content: CMSContent | null }) {
   );
 }
 
-function HowItWorks() {
-  const steps = [
+function HowItWorks({ content }: { content: CMSContent | null }) {
+  const defaultSteps = [
     { n: "01", title: "Formular ausfüllen", copy: "Stellen Sie Ihr Projekt über unser Kontaktformular kurz vor – auch anonymisiert möglich." },
     { n: "02", title: "Inhalte freigeben", copy: "Wir pflegen Ihre Angaben ein. Veröffentlicht wird erst nach Ihrer ausdrücklichen Freigabe." },
     { n: "03", title: "Anfragen erhalten", copy: "Investorenanfragen leiten wir direkt an Sie weiter. Sie entscheiden, mit wem Sie sprechen." },
     { n: "04", title: "Direkt verhandeln", copy: "Sie verhandeln Konditionen direkt mit dem Investor. Wir begleiten Sie bei der Finanzierung." },
   ];
+  
+  const sectionTitle = content?.homepageHowItWorks?.title || "In vier Schritten zur Finanzierung.";
+  const sectionEyebrow = content?.homepageHowItWorks?.subtitle || "Wie geht´s?";
+  const steps = content?.homepageHowItWorks?.steps || defaultSteps;
+
   return (
     <section className="border-b border-border bg-background py-24">
       <div className="mx-auto max-w-7xl px-6">
-        <SectionHeading eyebrow="Wie geht´s?" title="In vier Schritten zur Finanzierung." />
+        <SectionHeading eyebrow={sectionEyebrow} title={sectionTitle} />
         <div className="mt-14 grid gap-10 md:grid-cols-2 lg:grid-cols-4">
           {steps.map((s) => (
             <div key={s.n} className="border-t border-foreground/15 pt-6">
@@ -224,32 +229,40 @@ function HowItWorks() {
   );
 }
 
-function WhyUs() {
-  const items = [
-    { Icon: ShieldCheck, title: "Sie behalten die Kontrolle", copy: "Sie bestimmen, welche Informationen Sie bekannt geben – auf Wunsch auch vollständig anonym." },
-    { Icon: Handshake, title: "Kein automatisches Matching", copy: "Wir leiten Investoren direkt und persönlich an Sie weiter – keine Algorithmen, kein Massenversand." },
-    { Icon: Building2, title: "Keine Listing-Fee", copy: "Das Einstellen Ihres Projekts ist kostenfrei. Eine geringe Provision fällt nur im Erfolgsfall an." },
-    { Icon: Sparkles, title: "Persönliche Betreuung", copy: "Ein fester Ansprechpartner begleitet Sie von der Anfrage bis zur Finanzierungszusage." },
+function WhyUs({ content }: { content: CMSContent | null }) {
+  const defaultItems = [
+    { icon: "ShieldCheck", title: "Sie behalten die Kontrolle", copy: "Sie bestimmen, welche Informationen Sie bekannt geben – auf Wunsch auch vollständig anonym." },
+    { icon: "Handshake", title: "Kein automatisches Matching", copy: "Wir leiten Investoren direkt und persönlich an Sie weiter – keine Algorithmen, kein Massenversand." },
+    { icon: "Building2", title: "Keine Listing-Fee", copy: "Das Einstellen Ihres Projekts ist kostenfrei. Eine geringe Provision fällt nur im Erfolgsfall an." },
+    { icon: "Sparkles", title: "Persönliche Betreuung", copy: "Ein fester Ansprechpartner begleitet Sie von der Anfrage bis zur Finanzierungszusage." },
   ];
+
+  const sectionTitle = content?.homepageWhyUs?.title || "Hier finden Sie Investoren.";
+  const sectionEyebrow = content?.homepageWhyUs?.subtitle || "Ihre Vorteile";
+  const items = content?.homepageWhyUs?.items || defaultItems;
+
   return (
     <section className="bg-background py-24">
       <div className="mx-auto max-w-7xl px-6">
-        <SectionHeading eyebrow="Ihre Vorteile" title="Hier finden Sie Investoren." />
+        <SectionHeading eyebrow={sectionEyebrow} title={sectionTitle} />
         <p className="mt-6 max-w-2xl text-muted-foreground">
           Diese Plattform bietet Städten, Kommunen und staatlichen Einrichtungen
           die Möglichkeit, Projekte direkt über privatwirtschaftliche Investoren
           zu finanzieren.
         </p>
         <div className="mt-12 grid gap-10 md:grid-cols-2">
-          {items.map(({ Icon, title, copy }) => (
-            <div key={title} className="flex gap-5 border-t border-border pt-6">
-              <Icon className="h-6 w-6 shrink-0 text-accent" />
-              <div>
-                <h3 className="text-lg text-foreground">{title}</h3>
-                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{copy}</p>
+          {items.map((item, i) => {
+            const Icon = getIcon(item.icon);
+            return (
+              <div key={i} className="flex gap-5 border-t border-border pt-6">
+                <Icon className="h-6 w-6 shrink-0 text-accent" />
+                <div>
+                  <h3 className="text-lg text-foreground">{item.title}</h3>
+                  <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{item.copy}</p>
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
     </section>
@@ -398,20 +411,23 @@ function Videos({ content, onPlay }: { content: CMSContent | null; onPlay: (url:
   );
 }
 
-function CTASection() {
+function CTASection({ content }: { content: CMSContent | null }) {
+  const ctaTitle = content?.homepageCta?.title || "Lassen Sie uns sprechen.";
+  const ctaSubtitle = content?.homepageCta?.subtitle || "Ob Sie als Stadt ein Projekt platzieren möchten oder als Investor Kapital zu allokieren haben – wir freuen uns auf Ihre Nachricht.";
+  const btnText = content?.homepageCta?.buttonText || "Projekt einreichen";
+
   return (
     <section className="bg-primary text-primary-foreground">
       <div className="mx-auto grid max-w-7xl gap-8 px-6 py-20 md:grid-cols-[2fr_1fr] md:items-end">
         <div>
-          <h2 className="font-display text-4xl md:text-5xl">Lassen Sie uns sprechen.</h2>
-          <p className="mt-4 max-w-xl text-primary-foreground/75">
-            Ob Sie als Stadt ein Projekt platzieren möchten oder als Investor
-            Kapital zu allokieren haben – wir freuen uns auf Ihre Nachricht.
+          <h2 className="font-display text-4xl md:text-5xl">{ctaTitle}</h2>
+          <p className="mt-4 max-w-xl text-primary-foreground/75 leading-relaxed">
+            {ctaSubtitle}
           </p>
         </div>
         <div className="flex flex-wrap gap-3 md:justify-end">
           <Button asChild variant="hero" size="lg"><Link to="/contact" hash="investor">Für Investoren</Link></Button>
-          <Button asChild variant="heroOutline" size="lg"><Link to="/contact" hash="city">Für Städte</Link></Button>
+          <Button asChild variant="heroOutline" size="lg"><Link to="/contact" hash="city">{btnText}</Link></Button>
         </div>
       </div>
     </section>

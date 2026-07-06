@@ -3,6 +3,7 @@ import { toast } from "sonner";
 export type LeadType = "investor" | "city" | "chat";
 
 export interface CMSContent {
+  headerScripts?: string;
   hero: {
     title: string;
     subtitle: string;
@@ -14,6 +15,12 @@ export interface CMSContent {
   videos?: {
     cityVideoUrl: string;
     investorVideoUrl: string;
+  };
+  videoSectionTexts?: {
+    cityTitle: string;
+    cityCopy: string;
+    investorTitle: string;
+    investorCopy: string;
   };
   contact: {
     email: string;
@@ -28,6 +35,7 @@ export interface CMSContent {
     tag: string;
     title: string;
     excerpt: string;
+    content?: string;
     date: string;
     read: string;
   }>;
@@ -51,6 +59,21 @@ export interface CMSContent {
     introText1: string;
     introText2: string;
     projectTypes: string[];
+  };
+  homepageHowItWorks?: {
+    title: string;
+    subtitle: string;
+    steps: Array<{ n: string; title: string; copy: string }>;
+  };
+  homepageWhyUs?: {
+    title: string;
+    subtitle: string;
+    items: Array<{ icon: string; title: string; copy: string }>;
+  };
+  homepageCta?: {
+    title: string;
+    subtitle: string;
+    buttonText: string;
   };
 }
 
@@ -86,6 +109,7 @@ const DEFAULT_CONTENT: CMSContent = {
       tag: "Stadtentwicklung",
       title: "Warum mittelgroße deutsche Städte zur nächsten institutionellen Assetklasse werden",
       excerpt: "Mittelstädte in Deutschland liefern auf risikoadjustierter Basis zunehmend bessere Renditen als die Metropolen. Was wir in unserer Pipeline sehen.",
+      content: "Die Attraktivität von Mittelstädten (sogenannten B- und C-Standorten) wächst stetig. Während A-Metropolen wie Berlin, München oder Hamburg unter extrem niedrigen Renditen und hoher Regulierung leiden, bieten mittelgroße deutsche Städte ein stabiles wirtschaftliches Fundament mit deutlich attraktiveren Renditechancen.\n\n### Wachsende Nachfrage nach regionaler Infrastruktur\nKommunen abseits der Metropolen stehen vor großen Herausforderungen. Von der Sanierung öffentlicher Schulen bis hin zur Modernisierung von Verkehrswegen und Glasfasernetzen ist der Investitionsbedarf gigantisch. Da klassische Bankkredite durch regulatorische Hürden oft schwer zugänglich sind, gewinnen private Finanzierungspartnerschaften (ÖPP) an Bedeutung.\n\n### Vorteile für institutionelle Investoren:\n1. **Geringere Volatilität**: Die Mietmärkte und Immobilienwerte in mittleren Städten sind historisch stabiler.\n2. **Höhere Renditespreads**: Renditen liegen oft 1,0 bis 2,5 % über denen der Metropolen.\n3. **Partnerschaftliche Kooperation**: Kommunen zeigen sich bei Projektentwicklungen oft kooperativer und flexibler.",
       date: "März 2026",
       read: "6 Min. Lesezeit"
     },
@@ -94,6 +118,7 @@ const DEFAULT_CONTENT: CMSContent = {
       tag: "Energie & Infrastruktur",
       title: "Geduldiges Kapital für kommunale Erneuerbare",
       excerpt: "Wie langfristige Infrastrukturmandate und EU-Förderinstrumente die Finanzierung der Energiewende auf kommunaler Ebene verändern.",
+      content: "Kommunale Energieversorgung ist der Schlüssel zur Energiewende in Deutschland. Windparks, Solaranlagen und Fernwärmenetze erfordern jedoch erhebliche Vorabinvestitionen, die kommunale Haushalte allein nicht tragen können. Hier kommt sogenanntes „geduldiges Kapital“ ins Spiel.\n\n### Was ist geduldiges Kapital?\nGeduldiges Kapital beschreibt langfristig orientierte Investitionen, meist von Pensionskassen, Versicherungsgesellschaften oder Stiftungen. Diese Akteure suchen keine schnellen Spekulationsgewinne, sondern stabile, inflationsgeschützte Erträge über 15 bis 30 Jahre.\n\n### Kommunen profitieren doppelt:\n* **Planungssicherheit**: Langfristige Zinsbindungen und feste Abnahmeverträge schaffen verlässliche Haushaltsposten.\n* **Technologie-Vorsprung**: Investoren finanzieren oft modernste Speichertechnologien (Batterien) und intelligente Stromnetze gleich mit.",
       date: "Februar 2026",
       read: "8 Min. Lesezeit"
     },
@@ -102,6 +127,7 @@ const DEFAULT_CONTENT: CMSContent = {
       tag: "Öffentlich-private Partnerschaft",
       title: "ÖPP-Strukturen, die wirklich zur Unterschrift führen",
       excerpt: "Ein kompakter Leitfaden für Kämmerer und Stadträte zu Strukturen, die vom MoU bis zur Signatur tragen, ohne Marktvertrauen zu verspielen.",
+      content: "Öffentlich-Private Partnerschaften (ÖPP) gelten oft als bürokratisch und schwerfällig. Doch richtig strukturiert sind sie ein mächtiges Werkzeug, um öffentliche Projekte schneller und budgetkonformer umzusetzen.\n\n### Der Weg zum erfolgreichen Vertragsabschluss\nEin häufiger Fehler liegt in mangelhafter Vorbereitung. Eine klare Definition der Risikoverteilung zwischen öffentlicher Hand und privatem Partner ist der wichtigste Baustein.\n\n### Die Phasen einer erfolgreichen ÖPP-Struktur:\n1. **Bedarfsanalyse**: Eindeutige Definition, was gebaut oder betrieben werden soll.\n2. **Letter of Intent (LoI) / MoU**: Frühzeitige Festlegung der Kernpunkte, um das Interesse qualifizierter Investoren zu sichern.\n3. **Transparente Ausschreibung**: Klare Kriterien und zügige Vergabeprozesse.\n4. **Risikoallokation**: Risiken wie Baukostenüberschreitungen sollten bei der Partei liegen, die sie am besten kontrollieren kann (meist dem privaten Baupartner).",
       date: "Januar 2026",
       read: "5 Min. Lesezeit"
     }
@@ -136,7 +162,39 @@ const DEFAULT_CONTENT: CMSContent = {
       "Öffentlich-private Partnerschaften (ÖPP)",
       "Tourismus, Kultur & öffentliche Mobilität"
     ]
-  }
+  },
+  videoSectionTexts: {
+    cityTitle: "Für Städte & Kommunen",
+    cityCopy: "Wie Sie über Stadtfinanzen.de seriöses Kapital ansprechen, ohne sensible Details öffentlich preiszugeben.",
+    investorTitle: "Für Investoren",
+    investorCopy: "Wie institutionelle Investoren frühzeitig Zugang zu kuratierten Off-Market-Projekten in Deutschland und Europa erhalten."
+  },
+  homepageHowItWorks: {
+    title: "In vier Schritten zur Finanzierung.",
+    subtitle: "Wie geht´s?",
+    steps: [
+      { n: "01", title: "Formular ausfüllen", copy: "Stellen Sie Ihr Projekt über unser Kontaktformular kurz vor – auch anonymisiert möglich." },
+      { n: "02", title: "Inhalte freigeben", copy: "Wir pflegen Ihre Angaben ein. Veröffentlicht wird erst nach Ihrer ausdrücklichen Freigabe." },
+      { n: "03", title: "Anfragen erhalten", copy: "Investorenanfragen leiten wir direkt an Sie weiter. Sie entscheiden, mit wem Sie sprechen." },
+      { n: "04", title: "Direkt verhandeln", copy: "Sie verhandeln Konditionen direkt mit dem Investor. Wir begleiten Sie bei der Finanzierung." }
+    ]
+  },
+  homepageWhyUs: {
+    title: "Hier finden Sie Investoren.",
+    subtitle: "Ihre Vorteile",
+    items: [
+      { icon: "ShieldCheck", title: "Sie behalten die Kontrolle", copy: "Sie bestimmen, welche Informationen Sie bekannt geben – auf Wunsch auch vollständig anonym." },
+      { icon: "Handshake", title: "Kein automatisches Matching", copy: "Wir leiten Investoren direkt und persönlich an Sie weiter – keine Algorithmen, kein Massenversand." },
+      { icon: "Building2", title: "Keine Listing-Fee", copy: "Das Einstellen Ihres Projekts ist kostenfrei. Eine geringe Provision fällt nur im Erfolgsfall an." },
+      { icon: "Sparkles", title: "Persönliche Betreuung", copy: "Ein fester Ansprechpartner begleitet Sie von der Anfrage bis zur Finanzierungszusage." }
+    ]
+  },
+  homepageCta: {
+    title: "Bereit für den nächsten Schritt?",
+    subtitle: "Kommunale Finanzierung modern, diskret und effizient. Registrieren Sie sich noch heute kostenlos.",
+    buttonText: "Projekt einreichen"
+  },
+  headerScripts: ""
 };
 
 // HELPER: GET CURRENT CMS CONTENT

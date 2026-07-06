@@ -24,7 +24,9 @@ import {
   Compass,
   Sparkles,
   ChevronRight,
-  Image as ImageIcon
+  Image as ImageIcon,
+  Code,
+  CheckSquare
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -49,7 +51,9 @@ function AdminPage() {
   
   // Dashboard states
   const [activeTab, setActiveTab] = useState<"dashboard" | "leads" | "cms">("dashboard");
-  const [cmsSection, setCmsSection] = useState<"hero" | "media" | "projects" | "services" | "pricing" | "about" | "contact" | "blog">("hero");
+  const [cmsSection, setCmsSection] = useState<
+    "general" | "hero" | "media" | "howitworks" | "whyus" | "projects" | "services" | "pricing" | "about" | "cta" | "contact" | "blog"
+  >("general");
   const [leads, setLeads] = useState<any[]>([]);
   const [cmsContent, setCmsContent] = useState<CMSContent | null>(null);
   const [loading, setLoading] = useState(true);
@@ -92,6 +96,37 @@ function AdminPage() {
           };
         }
         
+        // Dynamic layout initializations
+        if (!fetchedContent.homepageHowItWorks) {
+          fetchedContent.homepageHowItWorks = {
+            title: "",
+            subtitle: "",
+            steps: []
+          };
+        }
+        if (!fetchedContent.homepageWhyUs) {
+          fetchedContent.homepageWhyUs = {
+            title: "",
+            subtitle: "",
+            items: []
+          };
+        }
+        if (!fetchedContent.homepageCta) {
+          fetchedContent.homepageCta = {
+            title: "",
+            subtitle: "",
+            buttonText: ""
+          };
+        }
+        if (!fetchedContent.videoSectionTexts) {
+          fetchedContent.videoSectionTexts = {
+            cityTitle: "",
+            cityCopy: "",
+            investorTitle: "",
+            investorCopy: ""
+          };
+        }
+        
         setLeads(fetchedLeads);
         setCmsContent(fetchedContent);
       } catch (err) {
@@ -111,9 +146,9 @@ function AdminPage() {
       localStorage.setItem("civita_admin_token", token);
       setAdminToken(token);
       setIsAuthenticated(true);
-      toast.success("Successfully logged in.");
+      toast.success("Erfolgreich angemeldet.");
     } else {
-      toast.error("Invalid password.");
+      toast.error("Falsches Passwort.");
     }
   };
 
@@ -121,7 +156,7 @@ function AdminPage() {
     localStorage.removeItem("civita_admin_token");
     setIsAuthenticated(false);
     setAdminToken("");
-    toast.success("Logged out.");
+    toast.success("Abgemeldet.");
   };
 
   // CMS functions
@@ -152,25 +187,25 @@ function AdminPage() {
               Admin Portal
             </h1>
             <p className="mt-2 text-sm text-muted-foreground">
-              Please sign in to access leads and website content editor.
+              Bitte melden Sie sich an, um Leads zu sehen und die Webseite zu bearbeiten.
             </p>
           </div>
           <form className="mt-8 space-y-6" onSubmit={handleLogin}>
             <div className="space-y-2">
               <label className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">
-                Password
+                Passwort
               </label>
               <Input
                 type="password"
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder="Enter admin password (default: admin)"
+                placeholder="Passwort eingeben (standard: admin)"
                 className="h-11"
               />
             </div>
-            <Button type="submit" className="w-full h-11">
-              Sign In
+            <Button type="submit" className="w-full h-11 cursor-pointer">
+              Anmelden
             </Button>
           </form>
         </div>
@@ -217,8 +252,8 @@ function AdminPage() {
         <div className="flex gap-2 border-b border-border/60 py-4 mb-8 overflow-x-auto">
           {[
             { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
-            { id: "leads", label: "Leads Submissions", icon: Users },
-            { id: "cms", label: "Visual CMS Panel", icon: FileText },
+            { id: "leads", label: "Anfragen (Leads)", icon: Users },
+            { id: "cms", label: "Webseiten CMS", icon: FileText },
           ].map((t) => {
             const Icon = t.icon;
             return (
@@ -243,7 +278,7 @@ function AdminPage() {
 
         {loading ? (
           <div className="flex h-60 items-center justify-center">
-            <div className="text-sm text-muted-foreground animate-pulse">Loading dashboard content...</div>
+            <div className="text-sm text-muted-foreground animate-pulse">Lade Dashboard...</div>
           </div>
         ) : (
           <div className="grid gap-8">
@@ -252,15 +287,15 @@ function AdminPage() {
               <div className="grid gap-6">
                 <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
                   {[
-                    { label: "Total Leads", val: totalLeads, desc: "Total submissions & chats", color: "text-primary bg-primary/10" },
-                    { label: "Investor Leads", val: investorLeadsCount, desc: "Via Investor Registration", color: "text-accent bg-accent/10" },
-                    { label: "City Leads", val: cityLeadsCount, desc: "Via City Project Form", color: "text-green-600 bg-green-50" },
-                    { label: "AI Concierge Leads", val: chatLeadsCount, desc: "Form & AI Chat Leads", color: "text-purple-600 bg-purple-50" },
+                    { label: "Anfragen Gesamt", val: totalLeads, desc: "Summe aller Formulare & Chats", color: "text-primary bg-primary/10" },
+                    { label: "Investoren Anfragen", val: investorLeadsCount, desc: "Über Investoren-Registrierung", color: "text-accent bg-accent/10" },
+                    { label: "Städte Anfragen", val: cityLeadsCount, desc: "Über Städte-Projektformular", color: "text-green-600 bg-green-50" },
+                    { label: "Chatbot / Formular Leads", val: chatLeadsCount, desc: "Über Concierge-Chatbot", color: "text-purple-600 bg-purple-50" },
                   ].map((s) => (
                     <div key={s.label} className="rounded-xl border border-border bg-card p-6 shadow-card">
                       <div className="flex items-center justify-between">
                         <span className="text-sm font-semibold text-muted-foreground">{s.label}</span>
-                        <span className={`rounded-full px-2 py-0.5 text-xs font-semibold ${s.color}`}>Active</span>
+                        <span className={`rounded-full px-2 py-0.5 text-xs font-semibold ${s.color}`}>Aktiv</span>
                       </div>
                       <div className="mt-4 font-display text-4xl font-bold">{s.val}</div>
                       <p className="mt-1 text-xs text-muted-foreground">{s.desc}</p>
@@ -269,20 +304,20 @@ function AdminPage() {
                 </div>
 
                 <div className="rounded-xl border border-border bg-card p-6 shadow-card">
-                  <h3 className="font-display text-xl font-bold mb-4">Recent Submissions</h3>
+                  <h3 className="font-display text-xl font-bold mb-4">Letzte Anfragen</h3>
                   {leads.length === 0 ? (
-                    <p className="text-sm text-muted-foreground py-6 text-center">No leads recorded yet.</p>
+                    <p className="text-sm text-muted-foreground py-6 text-center">Bisher noch keine Anfragen eingegangen.</p>
                   ) : (
                     <div className="divide-y divide-border">
                       {leads.slice(0, 5).map((l) => (
                         <div key={l.id} className="flex justify-between items-center py-4">
                           <div>
-                            <span className="font-medium text-foreground">{l.data?.name || "No Name"}</span>
+                            <span className="font-medium text-foreground">{l.data?.name || "Unbekannter Name"}</span>
                             <span className="ml-2 text-xs uppercase tracking-wider text-muted-foreground px-2 py-0.5 bg-muted rounded-full">
                               {l.type}
                             </span>
                             <div className="text-xs text-muted-foreground mt-1">
-                              {l.data?.company || "N/A"} · {l.data?.email || "N/A"}
+                              {l.data?.company || "Kein Unternehmen"} · {l.data?.email || "Keine Mail"}
                             </div>
                           </div>
                           <div className="text-right">
@@ -323,7 +358,7 @@ function AdminPage() {
                       <Input
                         value={leadsSearch}
                         onChange={(e) => setLeadsSearch(e.target.value)}
-                        placeholder="Search leads by name, email..."
+                        placeholder="Suchen nach Name, Email..."
                         className="pl-9 h-10 text-sm"
                       />
                     </div>
@@ -338,7 +373,7 @@ function AdminPage() {
                               : "bg-background border-border text-muted-foreground hover:text-foreground"
                           }`}
                         >
-                          {f === "all" ? "All" : f === "chat" ? "AI / Form Chat" : f}
+                          {f === "all" ? "Alle" : f === "chat" ? "AI / Form Chat" : f === "investor" ? "Investoren" : "Städte"}
                         </button>
                       ))}
                     </div>
@@ -349,17 +384,17 @@ function AdminPage() {
                       <table className="w-full text-left text-sm">
                         <thead className="bg-muted/40 border-b border-border text-xs uppercase tracking-wider text-muted-foreground font-semibold">
                           <tr>
-                            <th className="px-6 py-3">Lead / Company</th>
-                            <th className="px-6 py-3">Contact</th>
-                            <th className="px-6 py-3">Type</th>
-                            <th className="px-6 py-3">Submitted At</th>
+                            <th className="px-6 py-3">Lead / Firma</th>
+                            <th className="px-6 py-3">Kontakt</th>
+                            <th className="px-6 py-3">Typ</th>
+                            <th className="px-6 py-3">Datum</th>
                           </tr>
                         </thead>
                         <tbody className="divide-y divide-border">
                           {filteredLeads.length === 0 ? (
                             <tr>
                               <td colSpan={4} className="px-6 py-10 text-center text-muted-foreground">
-                                No leads match your filters.
+                                Keine Anfragen gefunden.
                               </td>
                             </tr>
                           ) : (
@@ -373,11 +408,11 @@ function AdminPage() {
                               >
                                 <td className="px-6 py-4">
                                   <div className="font-semibold text-foreground">{lead.data?.name}</div>
-                                  <div className="text-xs text-muted-foreground mt-0.5">{lead.data?.company || "N/A"}</div>
+                                  <div className="text-xs text-muted-foreground mt-0.5">{lead.data?.company || "Keine Angaben"}</div>
                                 </td>
                                 <td className="px-6 py-4">
                                   <div className="text-foreground">{lead.data?.email}</div>
-                                  <div className="text-xs text-muted-foreground mt-0.5">{lead.data?.phone || "N/A"}</div>
+                                  <div className="text-xs text-muted-foreground mt-0.5">{lead.data?.phone || "Keine Angaben"}</div>
                                 </td>
                                 <td className="px-6 py-4">
                                   <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-semibold ${
@@ -412,7 +447,7 @@ function AdminPage() {
                   {selectedLead ? (
                     <div className="space-y-6">
                       <div className="flex items-center justify-between border-b border-border pb-4">
-                        <h3 className="font-display text-xl font-bold">Lead Details</h3>
+                        <h3 className="font-display text-xl font-bold">Details anzeigen</h3>
                         <span className="text-xs uppercase tracking-wider px-2 py-0.5 bg-muted rounded-full text-muted-foreground">
                           ID: {selectedLead.id}
                         </span>
@@ -426,19 +461,19 @@ function AdminPage() {
 
                         {selectedLead.data?.company && (
                           <div>
-                            <label className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Company / Organisation</label>
+                            <label className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Unternehmen / Organisation</label>
                             <div className="font-medium text-foreground text-sm mt-0.5">{selectedLead.data?.company}</div>
                           </div>
                         )}
 
                         <div className="grid grid-cols-2 gap-4">
                           <div>
-                            <label className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Email</label>
+                            <label className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">E-Mail</label>
                             <div className="text-sm mt-0.5 break-all select-all font-medium text-foreground">{selectedLead.data?.email}</div>
                           </div>
                           <div>
-                            <label className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Phone</label>
-                            <div className="text-sm mt-0.5 select-all font-medium text-foreground">{selectedLead.data?.phone || "N/A"}</div>
+                            <label className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Telefon</label>
+                            <div className="text-sm mt-0.5 select-all font-medium text-foreground">{selectedLead.data?.phone || "Keine Angabe"}</div>
                           </div>
                         </div>
 
@@ -446,21 +481,21 @@ function AdminPage() {
                           <div className="border-t border-border pt-4 space-y-4">
                             <div className="grid grid-cols-2 gap-4">
                               <div>
-                                <label className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Investor Type</label>
+                                <label className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Investorentyp</label>
                                 <div className="text-sm font-medium mt-0.5">{selectedLead.data?.investorType || "N/A"}</div>
                               </div>
                               <div>
-                                <label className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Asset Class</label>
+                                <label className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Anlageschwerpunkt</label>
                                 <div className="text-sm font-medium mt-0.5">{selectedLead.data?.assetClass || "N/A"}</div>
                               </div>
                             </div>
                             <div className="grid grid-cols-2 gap-4">
                               <div>
-                                <label className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Volume Range</label>
+                                <label className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Investitionsvolumen</label>
                                 <div className="text-sm font-medium mt-0.5">{selectedLead.data?.range || "N/A"}</div>
                               </div>
                               <div>
-                                <label className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Preferred Geography</label>
+                                <label className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Region</label>
                                 <div className="text-sm font-medium mt-0.5">{selectedLead.data?.geography || "N/A"}</div>
                               </div>
                             </div>
@@ -471,18 +506,22 @@ function AdminPage() {
                           <div className="border-t border-border pt-4 space-y-4">
                             <div className="grid grid-cols-2 gap-4">
                               <div>
-                                <label className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Financing Type</label>
-                                <div className="text-sm font-medium mt-0.5">{selectedLead.data?.financingType || "N/A"}</div>
+                                <label className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Finanzierungstyp</label>
+                                <div className="text-sm font-medium mt-0.5">{selectedLead.data?.financing || "N/A"}</div>
                               </div>
                               <div>
-                                <label className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Project Size</label>
-                                <div className="text-sm font-medium mt-0.5">{selectedLead.data?.range || "N/A"}</div>
+                                <label className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Projektgröße</label>
+                                <div className="text-sm font-medium mt-0.5">{selectedLead.data?.size || "N/A"}</div>
                               </div>
                             </div>
                             <div>
-                              <label className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Project Description</label>
+                              <label className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Projekttyp</label>
+                              <div className="text-sm font-medium mt-0.5">{selectedLead.data?.projectType || "N/A"}</div>
+                            </div>
+                            <div>
+                              <label className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Projektbeschreibung</label>
                               <div className="text-sm text-foreground bg-muted/40 rounded-md p-3 mt-1 leading-relaxed whitespace-pre-wrap">
-                                {selectedLead.data?.description || "N/A"}
+                                {selectedLead.data?.description || "Keine Beschreibung"}
                               </div>
                             </div>
                           </div>
@@ -492,18 +531,18 @@ function AdminPage() {
                           <div className="border-t border-border pt-4 space-y-4">
                             <div className="grid grid-cols-2 gap-4">
                               <div>
-                                <label className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">User Type / Path</label>
+                                <label className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Typ des Nutzers</label>
                                 <div className="text-sm font-medium mt-0.5 capitalize">{selectedLead.data?.investorType || "N/A"}</div>
                               </div>
                               <div>
-                                <label className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Message / range</label>
+                                <label className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Angefragter Betrag / Volumen</label>
                                 <div className="text-sm font-medium mt-0.5">{selectedLead.data?.message || selectedLead.data?.range || "N/A"}</div>
                               </div>
                             </div>
                             
                             <div>
                               <label className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold flex items-center gap-1">
-                                <MessageSquare className="h-3 w-3" /> Chat Details & Transcripts
+                                <MessageSquare className="h-3 w-3" /> Chatverlauf & Nachrichten
                               </label>
                               <div className="text-xs font-mono text-foreground bg-muted/50 border rounded-lg p-3 mt-1 max-h-60 overflow-y-auto whitespace-pre-wrap leading-relaxed">
                                 {selectedLead.data?.details?.transcript || "N/A"}
@@ -516,7 +555,7 @@ function AdminPage() {
                   ) : (
                     <div className="text-center py-12 text-muted-foreground">
                       <Users className="h-8 w-8 mx-auto opacity-40 mb-2" />
-                      <p className="text-sm font-medium">Select a lead from the table to view full submission fields.</p>
+                      <p className="text-sm font-medium">Klicken Sie auf eine Zeile in der Tabelle, um Details anzuzeigen.</p>
                     </div>
                   )}
                 </div>
@@ -529,14 +568,18 @@ function AdminPage() {
                 {/* CMS Sidebar Navigation */}
                 <div className="flex flex-col gap-1 border-r border-border/80 pr-4 h-fit">
                   {[
-                    { id: "hero", label: "Hero & Metrics", icon: Globe },
+                    { id: "general", label: "Allgemein & Scripts", icon: Code },
+                    { id: "hero", label: "Hero & Statistiken", icon: Globe },
                     { id: "media", label: "Background Media", icon: ImageIcon },
+                    { id: "howitworks", label: "Ablauf (How It Works)", icon: CheckSquare },
+                    { id: "whyus", label: "Vorteile (Why Us)", icon: Sparkles },
+                    { id: "cta", label: "CTA Box & Button", icon: Layers },
                     { id: "projects", label: "Projekttypen Cards", icon: Hammer },
                     { id: "services", label: "Leistungen Cards", icon: Compass },
                     { id: "pricing", label: "Preise (Pricing)", icon: Sparkles },
                     { id: "about", label: "Über Uns Page", icon: FileText },
                     { id: "contact", label: "Kontakt Details", icon: Phone },
-                    { id: "blog", label: "Blog Articles", icon: FileText }
+                    { id: "blog", label: "Blog & Artikel", icon: FileText }
                   ].map((s) => {
                     const Icon = s.icon;
                     return (
@@ -559,7 +602,7 @@ function AdminPage() {
 
                   <div className="mt-8 border-t border-border pt-4">
                     <Button onClick={handleSaveCMS} className="w-full gap-2 cursor-pointer flex items-center justify-center h-10 font-bold text-xs">
-                      <Save className="h-4 w-4" /> Save changes
+                      <Save className="h-4 w-4" /> Änderungen speichern
                     </Button>
                   </div>
                 </div>
@@ -567,13 +610,40 @@ function AdminPage() {
                 {/* CMS Form Editor Area */}
                 <div className="bg-card border border-border rounded-xl p-6 shadow-card space-y-6">
                   
+                  {/* General settings & script tags */}
+                  {cmsSection === "general" && (
+                    <div className="space-y-4">
+                      <h3 className="font-display text-lg font-bold border-b pb-2">Allgemeine Einstellungen & Scripte</h3>
+                      
+                      <div className="space-y-2">
+                        <label className="text-xs uppercase tracking-wider text-muted-foreground font-semibold flex items-center gap-1">
+                          <Code className="h-4 w-4" /> Header Code / Injektionen (HTML/Scripts/Styles)
+                        </label>
+                        <p className="text-xs text-muted-foreground">
+                          Hier können Sie Google Analytics Scripte, CSS Styles oder Meta Tags einfügen. Sie werden automatisch in den Head-Bereich geladen.
+                        </p>
+                        <Textarea
+                          value={cmsContent.headerScripts || ""}
+                          onChange={(e) => {
+                            const updated = { ...cmsContent };
+                            updated.headerScripts = e.target.value;
+                            setCmsContent(updated);
+                          }}
+                          placeholder="e.g. <script src='https://www.googletagmanager.com/...'></script>"
+                          rows={12}
+                          className="font-mono text-xs bg-slate-950 text-slate-100 placeholder:text-slate-600 focus:border-accent"
+                        />
+                      </div>
+                    </div>
+                  )}
+
                   {/* Hero Settings */}
                   {cmsSection === "hero" && (
                     <div className="space-y-4">
-                      <h3 className="font-display text-lg font-bold border-b pb-2">Hero & Statistics</h3>
+                      <h3 className="font-display text-lg font-bold border-b pb-2">Hero Bereich & Kennzahlen</h3>
                       
                       <div className="space-y-2">
-                        <label className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">Hero Title</label>
+                        <label className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">Haupt-Überschrift (Hero Title)</label>
                         <Textarea
                           value={cmsContent.hero.title}
                           onChange={(e) => {
@@ -587,7 +657,7 @@ function AdminPage() {
                       </div>
 
                       <div className="space-y-2">
-                        <label className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">Hero Subtitle</label>
+                        <label className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">Beschreibungstext (Hero Subtitle)</label>
                         <Textarea
                           value={cmsContent.hero.subtitle}
                           onChange={(e) => {
@@ -600,7 +670,7 @@ function AdminPage() {
                       </div>
 
                       <div className="space-y-2 pt-2">
-                        <label className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">Metric stats cards (4 items)</label>
+                        <label className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">Kennzahlen Statistiken (4 Karten)</label>
                         <div className="grid gap-4 sm:grid-cols-2">
                           {cmsContent.hero.stats.map((stat, i) => (
                             <div key={i} className="border border-border/80 bg-muted/20 p-3 rounded-lg flex gap-2">
@@ -611,7 +681,7 @@ function AdminPage() {
                                   updated.hero.stats[i].value = e.target.value;
                                   setCmsContent(updated);
                                 }}
-                                placeholder="Value"
+                                placeholder="Wert (z.B. 3.000+)"
                                 className="w-1/3 text-xs h-8"
                               />
                               <Input
@@ -634,10 +704,10 @@ function AdminPage() {
                   {/* Background Media */}
                   {cmsSection === "media" && (
                     <div className="space-y-4">
-                      <h3 className="font-display text-lg font-bold border-b pb-2">Background media configuration</h3>
+                      <h3 className="font-display text-lg font-bold border-b pb-2">Hintergrund-Medien (Hero Section)</h3>
                       
                       <div className="space-y-2">
-                        <label className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">Background Media Type</label>
+                        <label className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">Medientyp des Hintergrunds</label>
                         <select
                           value={cmsContent.hero.bgType || "video"}
                           onChange={(e) => {
@@ -647,13 +717,13 @@ function AdminPage() {
                           }}
                           className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm outline-none focus:border-accent"
                         >
-                          <option value="video">Explanatory Video (Loops in Background)</option>
-                          <option value="image">Custom Background Image</option>
+                          <option value="video">Erklärvideo abspielen (Loops im Hintergrund)</option>
+                          <option value="image">Benutzerdefiniertes Hintergrundbild einsetzen</option>
                         </select>
                       </div>
 
                       <div className="space-y-2">
-                        <label className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">Background Image URL (Loads if Image Selected)</label>
+                        <label className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">Bild-URL des Hintergrunds (wenn Bild ausgewählt)</label>
                         <Input
                           value={cmsContent.hero.imageUrl || ""}
                           onChange={(e) => {
@@ -661,12 +731,12 @@ function AdminPage() {
                             updated.hero.imageUrl = e.target.value;
                             setCmsContent(updated);
                           }}
-                          placeholder="e.g. https://images.unsplash.com/photo-..."
+                          placeholder="z.B. https://images.unsplash.com/photo-..."
                         />
                       </div>
 
                       <div className="space-y-2">
-                        <label className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">Background Video URL (Loads if Video Selected)</label>
+                        <label className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">Video-URL des Hintergrunds (wenn Video ausgewählt)</label>
                         <Input
                           value={cmsContent.hero.videoUrl || ""}
                           onChange={(e) => {
@@ -674,7 +744,209 @@ function AdminPage() {
                             updated.hero.videoUrl = e.target.value;
                             setCmsContent(updated);
                           }}
-                          placeholder="e.g. Direct MP4 link"
+                          placeholder="z.B. Direkter MP4 Link"
+                        />
+                      </div>
+                    </div>
+                  )}
+
+                  {/* How it works steps editing */}
+                  {cmsSection === "howitworks" && cmsContent.homepageHowItWorks && (
+                    <div className="space-y-4">
+                      <h3 className="font-display text-lg font-bold border-b pb-2">Ablauf (How It Works Section)</h3>
+                      
+                      <div className="grid gap-4 sm:grid-cols-2">
+                        <div className="space-y-1">
+                          <label className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">Eyebrow / Ober-Überschrift</label>
+                          <Input
+                            value={cmsContent.homepageHowItWorks.subtitle}
+                            onChange={(e) => {
+                              const updated = { ...cmsContent };
+                              if (updated.homepageHowItWorks) updated.homepageHowItWorks.subtitle = e.target.value;
+                              setCmsContent(updated);
+                            }}
+                          />
+                        </div>
+                        <div className="space-y-1">
+                          <label className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">Bereichs-Überschrift (Title)</label>
+                          <Input
+                            value={cmsContent.homepageHowItWorks.title}
+                            onChange={(e) => {
+                              const updated = { ...cmsContent };
+                              if (updated.homepageHowItWorks) updated.homepageHowItWorks.title = e.target.value;
+                              setCmsContent(updated);
+                            }}
+                          />
+                        </div>
+                      </div>
+
+                      <div className="space-y-4 pt-2">
+                        <label className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">Die 4 Ablauf-Schritte</label>
+                        <div className="grid gap-4 md:grid-cols-2">
+                          {(cmsContent.homepageHowItWorks.steps || []).map((step, i) => (
+                            <div key={i} className="border p-4 bg-muted/10 rounded-xl space-y-2">
+                              <div className="flex gap-2">
+                                <Input
+                                  value={step.n}
+                                  onChange={(e) => {
+                                    const updated = { ...cmsContent };
+                                    if (updated.homepageHowItWorks) updated.homepageHowItWorks.steps[i].n = e.target.value;
+                                    setCmsContent(updated);
+                                  }}
+                                  className="w-12 h-8 text-center text-xs font-bold font-mono"
+                                  placeholder="Nr"
+                                />
+                                <Input
+                                  value={step.title}
+                                  onChange={(e) => {
+                                    const updated = { ...cmsContent };
+                                    if (updated.homepageHowItWorks) updated.homepageHowItWorks.steps[i].title = e.target.value;
+                                    setCmsContent(updated);
+                                  }}
+                                  className="h-8 text-xs font-semibold"
+                                  placeholder="Schritt Name"
+                                />
+                              </div>
+                              <Textarea
+                                value={step.copy}
+                                onChange={(e) => {
+                                  const updated = { ...cmsContent };
+                                  if (updated.homepageHowItWorks) updated.homepageHowItWorks.steps[i].copy = e.target.value;
+                                  setCmsContent(updated);
+                                }}
+                                rows={3}
+                                className="text-xs"
+                                placeholder="Beschreibung"
+                              />
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Why Us section editing */}
+                  {cmsSection === "whyus" && cmsContent.homepageWhyUs && (
+                    <div className="space-y-4">
+                      <h3 className="font-display text-lg font-bold border-b pb-2">Vorteile (Why Us Section)</h3>
+                      
+                      <div className="grid gap-4 sm:grid-cols-2">
+                        <div className="space-y-1">
+                          <label className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">Eyebrow / Ober-Überschrift</label>
+                          <Input
+                            value={cmsContent.homepageWhyUs.subtitle}
+                            onChange={(e) => {
+                              const updated = { ...cmsContent };
+                              if (updated.homepageWhyUs) updated.homepageWhyUs.subtitle = e.target.value;
+                              setCmsContent(updated);
+                            }}
+                          />
+                        </div>
+                        <div className="space-y-1">
+                          <label className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">Bereichs-Überschrift (Title)</label>
+                          <Input
+                            value={cmsContent.homepageWhyUs.title}
+                            onChange={(e) => {
+                              const updated = { ...cmsContent };
+                              if (updated.homepageWhyUs) updated.homepageWhyUs.title = e.target.value;
+                              setCmsContent(updated);
+                            }}
+                          />
+                        </div>
+                      </div>
+
+                      <div className="space-y-4 pt-2">
+                        <label className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">Die 4 Vorteile-Karten</label>
+                        <div className="grid gap-4 md:grid-cols-2">
+                          {(cmsContent.homepageWhyUs.items || []).map((item, i) => (
+                            <div key={i} className="border p-4 bg-muted/10 rounded-xl space-y-2">
+                              <div className="grid gap-2 grid-cols-2">
+                                <div className="space-y-1">
+                                  <label className="text-[9px] uppercase tracking-wider font-bold text-muted-foreground">Title</label>
+                                  <Input
+                                    value={item.title}
+                                    onChange={(e) => {
+                                      const updated = { ...cmsContent };
+                                      if (updated.homepageWhyUs) updated.homepageWhyUs.items[i].title = e.target.value;
+                                      setCmsContent(updated);
+                                    }}
+                                    className="h-8 text-xs font-semibold"
+                                  />
+                                </div>
+                                <div className="space-y-1">
+                                  <label className="text-[9px] uppercase tracking-wider font-bold text-muted-foreground">Icon</label>
+                                  <select
+                                    value={item.icon}
+                                    onChange={(e) => {
+                                      const updated = { ...cmsContent };
+                                      if (updated.homepageWhyUs) updated.homepageWhyUs.items[i].icon = e.target.value;
+                                      setCmsContent(updated);
+                                    }}
+                                    className="w-full rounded-md border border-border bg-background px-2 py-1 text-xs outline-none focus:border-accent"
+                                  >
+                                    {["ShieldCheck", "Handshake", "Building2", "Sparkles", "Layers", "Users", "Compass", "Zap", "GraduationCap", "Hammer"].map((icon) => (
+                                      <option key={icon} value={icon}>{icon}</option>
+                                    ))}
+                                  </select>
+                                </div>
+                              </div>
+                              <Textarea
+                                value={item.copy}
+                                onChange={(e) => {
+                                  const updated = { ...cmsContent };
+                                  if (updated.homepageWhyUs) updated.homepageWhyUs.items[i].copy = e.target.value;
+                                  setCmsContent(updated);
+                                }}
+                                rows={2}
+                                className="text-xs"
+                              />
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* CTA Section editing */}
+                  {cmsSection === "cta" && cmsContent.homepageCta && (
+                    <div className="space-y-4">
+                      <h3 className="font-display text-lg font-bold border-b pb-2">Handlungsaufforderung (CTA Box)</h3>
+                      
+                      <div className="space-y-2">
+                        <label className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">CTA Haupt-Überschrift</label>
+                        <Input
+                          value={cmsContent.homepageCta.title}
+                          onChange={(e) => {
+                            const updated = { ...cmsContent };
+                            if (updated.homepageCta) updated.homepageCta.title = e.target.value;
+                            setCmsContent(updated);
+                          }}
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <label className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">CTA Beschreibungstext</label>
+                        <Textarea
+                          value={cmsContent.homepageCta.subtitle}
+                          onChange={(e) => {
+                            const updated = { ...cmsContent };
+                            if (updated.homepageCta) updated.homepageCta.subtitle = e.target.value;
+                            setCmsContent(updated);
+                          }}
+                          rows={3}
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <label className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">Beschriftung Städte-Button</label>
+                        <Input
+                          value={cmsContent.homepageCta.buttonText}
+                          onChange={(e) => {
+                            const updated = { ...cmsContent };
+                            if (updated.homepageCta) updated.homepageCta.buttonText = e.target.value;
+                            setCmsContent(updated);
+                          }}
+                          placeholder="z.B. Projekt einreichen"
                         />
                       </div>
                     </div>
@@ -684,11 +956,11 @@ function AdminPage() {
                   {cmsSection === "projects" && (
                     <div className="space-y-4">
                       <div className="flex justify-between items-center border-b pb-2">
-                        <h3 className="font-display text-lg font-bold">Homepage Project Types List</h3>
+                        <h3 className="font-display text-lg font-bold">Projekttypen auf Startseite</h3>
                         <Button
                           size="xs"
                           variant="accent"
-                          className="font-bold text-xs"
+                          className="font-bold text-xs cursor-pointer"
                           onClick={() => {
                             const updated = { ...cmsContent };
                             if (!updated.projectTypesList) updated.projectTypesList = [];
@@ -700,7 +972,7 @@ function AdminPage() {
                             setCmsContent(updated);
                           }}
                         >
-                          <Plus className="h-3 w-3 mr-1" /> Add Type
+                          <Plus className="h-3 w-3 mr-1" /> Typ hinzufügen
                         </Button>
                       </div>
 
@@ -714,14 +986,14 @@ function AdminPage() {
                                 setCmsContent(updated);
                               }}
                               className="absolute top-2 right-2 text-muted-foreground hover:text-destructive transition-colors cursor-pointer"
-                              title="Delete Item"
+                              title="Löschen"
                             >
                               <Trash2 className="h-4 w-4" />
                             </button>
 
                             <div className="grid gap-3 sm:grid-cols-2">
                               <div className="space-y-1">
-                                <label className="text-[10px] uppercase tracking-wider text-muted-foreground font-bold">Title</label>
+                                <label className="text-[10px] uppercase tracking-wider text-muted-foreground font-bold">Karten Titel</label>
                                 <Input
                                   value={item.title}
                                   onChange={(e) => {
@@ -751,7 +1023,7 @@ function AdminPage() {
                             </div>
 
                             <div className="space-y-1">
-                              <label className="text-[10px] uppercase tracking-wider text-muted-foreground font-bold">Copy / Description</label>
+                              <label className="text-[10px] uppercase tracking-wider text-muted-foreground font-bold">Karten Text (Beschreibung)</label>
                               <Textarea
                                 value={item.copy}
                                 onChange={(e) => {
@@ -773,11 +1045,11 @@ function AdminPage() {
                   {cmsSection === "services" && (
                     <div className="space-y-4">
                       <div className="flex justify-between items-center border-b pb-2">
-                        <h3 className="font-display text-lg font-bold">Homepage Services List</h3>
+                        <h3 className="font-display text-lg font-bold">Leistungen auf Startseite</h3>
                         <Button
                           size="xs"
                           variant="accent"
-                          className="font-bold text-xs"
+                          className="font-bold text-xs cursor-pointer"
                           onClick={() => {
                             const updated = { ...cmsContent };
                             if (!updated.homepageServices) updated.homepageServices = [];
@@ -789,7 +1061,7 @@ function AdminPage() {
                             setCmsContent(updated);
                           }}
                         >
-                          <Plus className="h-3 w-3 mr-1" /> Add Service
+                          <Plus className="h-3 w-3 mr-1" /> Leistung hinzufügen
                         </Button>
                       </div>
 
@@ -803,14 +1075,14 @@ function AdminPage() {
                                 setCmsContent(updated);
                               }}
                               className="absolute top-2 right-2 text-muted-foreground hover:text-destructive transition-colors cursor-pointer"
-                              title="Delete Item"
+                              title="Löschen"
                             >
                               <Trash2 className="h-4 w-4" />
                             </button>
 
                             <div className="grid gap-3 sm:grid-cols-2">
                               <div className="space-y-1">
-                                <label className="text-[10px] uppercase tracking-wider text-muted-foreground font-bold">Service Title</label>
+                                <label className="text-[10px] uppercase tracking-wider text-muted-foreground font-bold">Leistungs-Titel</label>
                                 <Input
                                   value={item.title}
                                   onChange={(e) => {
@@ -840,7 +1112,7 @@ function AdminPage() {
                             </div>
 
                             <div className="space-y-1">
-                              <label className="text-[10px] uppercase tracking-wider text-muted-foreground font-bold">Description Copy</label>
+                              <label className="text-[10px] uppercase tracking-wider text-muted-foreground font-bold">Karten Text (Beschreibung)</label>
                               <Textarea
                                 value={item.copy}
                                 onChange={(e) => {
@@ -862,22 +1134,22 @@ function AdminPage() {
                   {cmsSection === "pricing" && (
                     <div className="space-y-4">
                       <div className="flex justify-between items-center border-b pb-2">
-                        <h3 className="font-display text-lg font-bold">Website Pricing Tiers</h3>
+                        <h3 className="font-display text-lg font-bold">Preismodelle</h3>
                         <Button
                           size="xs"
                           variant="accent"
-                          className="font-bold text-xs"
+                          className="font-bold text-xs cursor-pointer"
                           onClick={() => {
                             const updated = { ...cmsContent };
                             if (!updated.pricingTiers) updated.pricingTiers = [];
                             updated.pricingTiers.push({
-                              title: "Neues Preismodell",
-                              copy: "Preismodell Beschreibung..."
+                              title: "Neues Modell",
+                              copy: "Kurze Beschreibung des Preismodells..."
                             });
                             setCmsContent(updated);
                           }}
                         >
-                          <Plus className="h-3 w-3 mr-1" /> Add Tier
+                          <Plus className="h-3 w-3 mr-1" /> Modell hinzufügen
                         </Button>
                       </div>
 
@@ -891,13 +1163,13 @@ function AdminPage() {
                                 setCmsContent(updated);
                               }}
                               className="absolute top-2 right-2 text-muted-foreground hover:text-destructive transition-colors cursor-pointer"
-                              title="Delete Item"
+                              title="Löschen"
                             >
                               <Trash2 className="h-4 w-4" />
                             </button>
 
                             <div className="space-y-1">
-                              <label className="text-[10px] uppercase tracking-wider text-muted-foreground font-bold">Tier Title</label>
+                              <label className="text-[10px] uppercase tracking-wider text-muted-foreground font-bold">Zielgruppe / Titel</label>
                               <Input
                                 value={item.title}
                                 onChange={(e) => {
@@ -910,7 +1182,7 @@ function AdminPage() {
                             </div>
 
                             <div className="space-y-1">
-                              <label className="text-[10px] uppercase tracking-wider text-muted-foreground font-bold">Copy description</label>
+                              <label className="text-[10px] uppercase tracking-wider text-muted-foreground font-bold">Details</label>
                               <Textarea
                                 value={item.copy}
                                 onChange={(e) => {
@@ -931,10 +1203,10 @@ function AdminPage() {
                   {/* About Page */}
                   {cmsSection === "about" && cmsContent.about && (
                     <div className="space-y-4">
-                      <h3 className="font-display text-lg font-bold border-b pb-2">Leistungen & Preise (About Page) CMS</h3>
+                      <h3 className="font-display text-lg font-bold border-b pb-2">Leistungen & Preise (About Page)</h3>
                       
                       <div className="space-y-2">
-                        <label className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">Page Main Title</label>
+                        <label className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">Seite Haupt-Überschrift (Title)</label>
                         <Input
                           value={cmsContent.about.title}
                           onChange={(e) => {
@@ -946,7 +1218,7 @@ function AdminPage() {
                       </div>
 
                       <div className="space-y-2">
-                        <label className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">Intro Title ("Sie bleiben in Kontrolle")</label>
+                        <label className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">Intro Überschrift (z.B. "Sie bleiben in Kontrolle")</label>
                         <Input
                           value={cmsContent.about.introTitle}
                           onChange={(e) => {
@@ -958,7 +1230,7 @@ function AdminPage() {
                       </div>
 
                       <div className="space-y-2">
-                        <label className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">Intro Paragraph 1</label>
+                        <label className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">Intro Absatz 1</label>
                         <Textarea
                           value={cmsContent.about.introText1}
                           onChange={(e) => {
@@ -971,7 +1243,7 @@ function AdminPage() {
                       </div>
 
                       <div className="space-y-2">
-                        <label className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">Intro Paragraph 2</label>
+                        <label className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">Intro Absatz 2</label>
                         <Textarea
                           value={cmsContent.about.introText2}
                           onChange={(e) => {
@@ -985,7 +1257,7 @@ function AdminPage() {
 
                       <div className="space-y-3 pt-2">
                         <div className="flex justify-between items-center border-b pb-1">
-                          <label className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">Projekttypen Checklist Bullet points</label>
+                          <label className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">Projekttypen Liste (Checkboxen)</label>
                           <Button
                             size="xs"
                             variant="outline"
@@ -994,12 +1266,12 @@ function AdminPage() {
                               const updated = { ...cmsContent };
                               if (updated.about) {
                                 if (!updated.about.projectTypes) updated.about.projectTypes = [];
-                                updated.about.projectTypes.push("Neuer Listeneintrag");
+                                updated.about.projectTypes.push("Neuer Eintrag");
                               }
                               setCmsContent(updated);
                             }}
                           >
-                            + Add Bullet
+                            + Eintrag hinzufügen
                           </Button>
                         </div>
 
@@ -1037,12 +1309,12 @@ function AdminPage() {
                   {/* Contact details */}
                   {cmsSection === "contact" && (
                     <div className="space-y-4">
-                      <h3 className="font-display text-lg font-bold border-b pb-2">Global Contact Fields</h3>
+                      <h3 className="font-display text-lg font-bold border-b pb-2">Globale Kontaktfelder</h3>
                       
                       <div className="grid gap-4 sm:grid-cols-2">
                         <div className="space-y-1">
                           <label className="text-xs uppercase tracking-wider text-muted-foreground font-semibold flex items-center gap-1">
-                            <Mail className="h-3.5 w-3.5 opacity-60" /> Email Address
+                            <Mail className="h-3.5 w-3.5 opacity-60" /> E-Mail-Adresse
                           </label>
                           <Input
                             value={cmsContent.contact.email}
@@ -1055,7 +1327,7 @@ function AdminPage() {
                         </div>
                         <div className="space-y-1">
                           <label className="text-xs uppercase tracking-wider text-muted-foreground font-semibold flex items-center gap-1">
-                            <Phone className="h-3.5 w-3.5 opacity-60" /> Phone Number
+                            <Phone className="h-3.5 w-3.5 opacity-60" /> Telefonnummer
                           </label>
                           <Input
                             value={cmsContent.contact.phone}
@@ -1070,7 +1342,7 @@ function AdminPage() {
 
                       <div className="space-y-1">
                         <label className="text-xs uppercase tracking-wider text-muted-foreground font-semibold flex items-center gap-1">
-                          <MapPin className="h-3.5 w-3.5 opacity-60" /> Location Address
+                          <MapPin className="h-3.5 w-3.5 opacity-60" /> Adresse
                         </label>
                         <Input
                           value={cmsContent.contact.address}
@@ -1082,86 +1354,155 @@ function AdminPage() {
                         />
                       </div>
 
-                      <h3 className="font-display text-lg font-bold border-b pt-4 pb-2">Explanatory Video Popup Links</h3>
-                      <div className="grid gap-4 sm:grid-cols-2">
-                        <div className="space-y-1">
-                          <label className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">Explanatory Video 1 (Cities)</label>
-                          <Input
-                            value={cmsContent.videos?.cityVideoUrl || ""}
-                            onChange={(e) => {
-                              const updated = { ...cmsContent };
-                              if (!updated.videos) updated.videos = { cityVideoUrl: "", investorVideoUrl: "" };
-                              updated.videos.cityVideoUrl = e.target.value;
-                              setCmsContent(updated);
-                            }}
-                            placeholder="e.g. YouTube Embed Link"
-                          />
-                        </div>
-                        <div className="space-y-1">
-                          <label className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">Explanatory Video 2 (Investors)</label>
-                          <Input
-                            value={cmsContent.videos?.investorVideoUrl || ""}
-                            onChange={(e) => {
-                              const updated = { ...cmsContent };
-                              if (!updated.videos) updated.videos = { cityVideoUrl: "", investorVideoUrl: "" };
-                              updated.videos.investorVideoUrl = e.target.value;
-                              setCmsContent(updated);
-                            }}
-                            placeholder="e.g. YouTube Embed Link"
-                          />
-                        </div>
-                      </div>
+                      {cmsContent.videoSectionTexts && (
+                        <>
+                          <h3 className="font-display text-lg font-bold border-b pt-4 pb-2">Erklärvideo Bereich (Texte & Links)</h3>
+                          <div className="space-y-4">
+                            <div className="border p-4 bg-muted/5 rounded-xl space-y-3">
+                              <h4 className="font-semibold text-xs border-b pb-1 text-accent">Erklärvideo für Städte</h4>
+                              <div className="grid gap-3 sm:grid-cols-2">
+                                <div className="space-y-1">
+                                  <label className="text-[10px] uppercase font-bold text-muted-foreground">Karten-Titel</label>
+                                  <Input
+                                    value={cmsContent.videoSectionTexts.cityTitle}
+                                    onChange={(e) => {
+                                      const updated = { ...cmsContent };
+                                      if (updated.videoSectionTexts) updated.videoSectionTexts.cityTitle = e.target.value;
+                                      setCmsContent(updated);
+                                    }}
+                                    className="h-8 text-xs font-semibold"
+                                  />
+                                </div>
+                                <div className="space-y-1">
+                                  <label className="text-[10px] uppercase font-bold text-muted-foreground">Video Embed URL (YouTube/MP4)</label>
+                                  <Input
+                                    value={cmsContent.videos?.cityVideoUrl || ""}
+                                    onChange={(e) => {
+                                      const updated = { ...cmsContent };
+                                      if (!updated.videos) updated.videos = { cityVideoUrl: "", investorVideoUrl: "" };
+                                      updated.videos.cityVideoUrl = e.target.value;
+                                      setCmsContent(updated);
+                                    }}
+                                    placeholder="z.B. YouTube Link"
+                                    className="h-8 text-xs font-mono"
+                                  />
+                                </div>
+                              </div>
+                              <div className="space-y-1">
+                                <label className="text-[10px] uppercase font-bold text-muted-foreground">Karten-Beschreibung</label>
+                                <Textarea
+                                  value={cmsContent.videoSectionTexts.cityCopy}
+                                  onChange={(e) => {
+                                    const updated = { ...cmsContent };
+                                    if (updated.videoSectionTexts) updated.videoSectionTexts.cityCopy = e.target.value;
+                                    setCmsContent(updated);
+                                  }}
+                                  rows={2}
+                                  className="text-xs"
+                                />
+                              </div>
+                            </div>
+
+                            <div className="border p-4 bg-muted/5 rounded-xl space-y-3">
+                              <h4 className="font-semibold text-xs border-b pb-1 text-accent">Erklärvideo für Investoren</h4>
+                              <div className="grid gap-3 sm:grid-cols-2">
+                                <div className="space-y-1">
+                                  <label className="text-[10px] uppercase font-bold text-muted-foreground">Karten-Titel</label>
+                                  <Input
+                                    value={cmsContent.videoSectionTexts.investorTitle}
+                                    onChange={(e) => {
+                                      const updated = { ...cmsContent };
+                                      if (updated.videoSectionTexts) updated.videoSectionTexts.investorTitle = e.target.value;
+                                      setCmsContent(updated);
+                                    }}
+                                    className="h-8 text-xs font-semibold"
+                                  />
+                                </div>
+                                <div className="space-y-1">
+                                  <label className="text-[10px] uppercase font-bold text-muted-foreground">Video Embed URL (YouTube/MP4)</label>
+                                  <Input
+                                    value={cmsContent.videos?.investorVideoUrl || ""}
+                                    onChange={(e) => {
+                                      const updated = { ...cmsContent };
+                                      if (!updated.videos) updated.videos = { cityVideoUrl: "", investorVideoUrl: "" };
+                                      updated.videos.investorVideoUrl = e.target.value;
+                                      setCmsContent(updated);
+                                    }}
+                                    placeholder="z.B. YouTube Link"
+                                    className="h-8 text-xs font-mono"
+                                  />
+                                </div>
+                              </div>
+                              <div className="space-y-1">
+                                <label className="text-[10px] uppercase font-bold text-muted-foreground">Karten-Beschreibung</label>
+                                <Textarea
+                                  value={cmsContent.videoSectionTexts.investorCopy}
+                                  onChange={(e) => {
+                                    const updated = { ...cmsContent };
+                                    if (updated.videoSectionTexts) updated.videoSectionTexts.investorCopy = e.target.value;
+                                    setCmsContent(updated);
+                                  }}
+                                  rows={2}
+                                  className="text-xs"
+                                />
+                              </div>
+                            </div>
+                          </div>
+                        </>
+                      )}
                     </div>
                   )}
 
-                  {/* Blog articles list */}
+                  {/* Blog articles list with dynamic page body content */}
                   {cmsSection === "blog" && (
                     <div className="space-y-4">
                       <div className="flex justify-between items-center border-b pb-2">
                         <h3 className="font-display text-lg font-bold flex items-center gap-2">
-                          <FileText className="h-5 w-5" /> Manage Blog Articles
+                          <FileText className="h-5 w-5" /> Blog Beiträge & Langtexte verwalten
                         </h3>
                         <Button
                           size="xs"
                           variant="accent"
-                          className="font-bold text-xs"
+                          className="font-bold text-xs cursor-pointer"
                           onClick={() => {
                             const updated = { ...cmsContent };
                             const newId = `post-${Date.now()}`;
                             updated.posts.push({
                               id: newId,
-                              tag: "Kategorie",
-                              title: "Neuer Blog-Titel",
-                              excerpt: "Zusammenfassung des Artikels...",
+                              tag: "Kommunalpolitik",
+                              title: "Titel des neuen Artikels",
+                              excerpt: "Ein kurzer Teaser für die Vorschau...",
+                              content: "# Neuer Artikel\n\nSchreiben Sie hier den Hauptinhalt des Beitrags...",
                               date: new Date().toLocaleDateString("de-DE", { month: "long", year: "numeric" }),
                               read: "5 Min. Lesezeit"
                             });
                             setCmsContent(updated);
-                            toast.info("Added draft. Save to apply.");
+                            toast.info("Entwurf hinzugefügt. Speichern um anzuwenden.");
                           }}
                         >
-                          <Plus className="h-3 w-3 mr-1" /> Add Article
+                          <Plus className="h-3 w-3 mr-1" /> Beitrag schreiben
                         </Button>
                       </div>
 
-                      <div className="space-y-4 max-h-[500px] overflow-y-auto pr-1">
+                      <div className="space-y-6 max-h-[600px] overflow-y-auto pr-1">
                         {cmsContent.posts.map((post, index) => (
-                          <div key={post.id} className="relative p-4 border border-border bg-muted/10 rounded-xl space-y-3">
+                          <div key={post.id} className="relative p-5 border border-border bg-muted/10 rounded-xl space-y-4">
                             <button
                               onClick={() => {
                                 const updated = { ...cmsContent };
                                 updated.posts.splice(index, 1);
                                 setCmsContent(updated);
-                                toast.warning("Deleted draft. Save to apply.");
+                                toast.warning("Entwurf entfernt. Speichern um anzuwenden.");
                               }}
                               className="absolute top-2 right-2 text-muted-foreground hover:text-destructive transition-colors cursor-pointer"
+                              title="Beitrag löschen"
                             >
                               <Trash2 className="h-4 w-4" />
                             </button>
 
                             <div className="grid gap-3 sm:grid-cols-3">
                               <div className="space-y-1">
-                                <label className="text-[10px] uppercase tracking-wider text-muted-foreground font-bold">Category Tag</label>
+                                <label className="text-[10px] uppercase tracking-wider text-muted-foreground font-bold">Kategorie Tag</label>
                                 <Input
                                   value={post.tag}
                                   onChange={(e) => {
@@ -1173,7 +1514,7 @@ function AdminPage() {
                                 />
                               </div>
                               <div className="space-y-1">
-                                <label className="text-[10px] uppercase tracking-wider text-muted-foreground font-bold">Publish Date</label>
+                                <label className="text-[10px] uppercase tracking-wider text-muted-foreground font-bold">Veröffentlichungsdatum</label>
                                 <Input
                                   value={post.date}
                                   onChange={(e) => {
@@ -1185,7 +1526,7 @@ function AdminPage() {
                                 />
                               </div>
                               <div className="space-y-1">
-                                <label className="text-[10px] uppercase tracking-wider text-muted-foreground font-bold">Read Time</label>
+                                <label className="text-[10px] uppercase tracking-wider text-muted-foreground font-bold">Lesezeit (z.B. 5 Min.)</label>
                                 <Input
                                   value={post.read}
                                   onChange={(e) => {
@@ -1199,7 +1540,7 @@ function AdminPage() {
                             </div>
 
                             <div className="space-y-1">
-                              <label className="text-[10px] uppercase tracking-wider text-muted-foreground font-bold">Title</label>
+                              <label className="text-[10px] uppercase tracking-wider text-muted-foreground font-bold">Überschrift (Title)</label>
                               <Input
                                 value={post.title}
                                 onChange={(e) => {
@@ -1212,7 +1553,7 @@ function AdminPage() {
                             </div>
 
                             <div className="space-y-1">
-                              <label className="text-[10px] uppercase tracking-wider text-muted-foreground font-bold">Excerpt Summary</label>
+                              <label className="text-[10px] uppercase tracking-wider text-muted-foreground font-bold">Vorschautext (Teaser Excerpt)</label>
                               <Textarea
                                 value={post.excerpt}
                                 onChange={(e) => {
@@ -1222,6 +1563,26 @@ function AdminPage() {
                                 }}
                                 rows={2}
                                 className="text-xs"
+                              />
+                            </div>
+
+                            <div className="space-y-1 pt-1">
+                              <label className="text-[10px] uppercase tracking-wider text-muted-foreground font-bold flex items-center gap-1">
+                                Ausführlicher Artikelinhalt (Markdown-Format)
+                              </label>
+                              <p className="text-[10px] text-muted-foreground">
+                                Format-Tipp: Verwenden Sie <code>## Überschrift</code> für Zwischenüberschriften, <code>- Listeneintrag</code> für Auflistungen und <code>**Fett**</code> für Hervorhebungen. Verwenden Sie leere Zeilen zwischen Absätzen.
+                              </p>
+                              <Textarea
+                                value={post.content || ""}
+                                onChange={(e) => {
+                                  const updated = { ...cmsContent };
+                                  updated.posts[index].content = e.target.value;
+                                  setCmsContent(updated);
+                                }}
+                                rows={10}
+                                className="text-xs font-mono bg-muted/40"
+                                placeholder="Schreiben Sie hier Ihren vollständigen Artikel..."
                               />
                             </div>
                           </div>

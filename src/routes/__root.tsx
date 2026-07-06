@@ -15,6 +15,7 @@ import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { Toaster } from "@/components/ui/sonner";
 import { ConciergeChat } from "@/components/concierge-chat";
+import { getContent } from "@/lib/leads";
 
 function NotFoundComponent() {
   return (
@@ -132,6 +133,39 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+
+  useEffect(() => {
+    // Dynamic Header Scripts Injection
+    getContent().then((data) => {
+      if (data?.headerScripts) {
+        try {
+          const container = document.createElement("div");
+          container.innerHTML = data.headerScripts;
+          Array.from(container.childNodes).forEach((node) => {
+            if (node.nodeName === "SCRIPT") {
+              const script = document.createElement("script");
+              Array.from((node as HTMLScriptElement).attributes).forEach((attr) => {
+                script.setAttribute(attr.name, attr.value);
+              });
+              script.innerHTML = (node as HTMLScriptElement).innerHTML;
+              document.head.appendChild(script);
+            } else if (node.nodeName === "LINK" || node.nodeName === "STYLE" || node.nodeName === "META") {
+              const el = document.createElement(node.nodeName.toLowerCase());
+              Array.from((node as HTMLElement).attributes).forEach((attr) => {
+                el.setAttribute(attr.name, attr.value);
+              });
+              if ((node as HTMLElement).innerHTML) {
+                el.innerHTML = (node as HTMLElement).innerHTML;
+              }
+              document.head.appendChild(el);
+            }
+          });
+        } catch (e) {
+          console.warn("Failed to inject dynamic header scripts:", e);
+        }
+      }
+    });
+  }, []);
 
   return (
     <QueryClientProvider client={queryClient}>
