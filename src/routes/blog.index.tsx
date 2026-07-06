@@ -51,7 +51,11 @@ function BlogPage() {
                   <div className="mt-1">{p.read}</div>
                 </div>
                 <div>
-                  <h2 className="font-display text-3xl text-foreground md:text-4xl">{p.title}</h2>
+                  <h2 className="font-display text-3xl text-foreground md:text-4xl hover:text-accent transition-colors">
+                    <Link to="/blog/$id" params={{ id: p.id }}>
+                      {p.title}
+                    </Link>
+                  </h2>
                   <p className="mt-4 text-muted-foreground leading-relaxed">{p.excerpt}</p>
                   <Link
                     to="/blog/$id"
