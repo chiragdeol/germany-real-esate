@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { ArrowLeft } from "lucide-react";
 import { getContent, type CMSContent } from "@/lib/leads";
 import { renderMarkdown } from "@/lib/markdown";
 
