@@ -52,7 +52,7 @@ function AdminPage() {
   // Dashboard states
   const [activeTab, setActiveTab] = useState<"dashboard" | "leads" | "cms">("dashboard");
   const [cmsSection, setCmsSection] = useState<
-    "general" | "hero" | "media" | "howitworks" | "whyus" | "projects" | "services" | "pricing" | "about" | "cta" | "contact" | "blog"
+    "general" | "hero" | "media" | "howitworks" | "whyus" | "projects" | "services" | "pricing" | "about" | "cta" | "contact" | "blog" | "impressum" | "datenschutz" | "cookies"
   >("general");
   const [leads, setLeads] = useState<any[]>([]);
   const [cmsContent, setCmsContent] = useState<CMSContent | null>(null);
@@ -579,7 +579,10 @@ function AdminPage() {
                     { id: "pricing", label: "Preise (Pricing)", icon: Sparkles },
                     { id: "about", label: "Über Uns Page", icon: FileText },
                     { id: "contact", label: "Kontakt Details", icon: Phone },
-                    { id: "blog", label: "Blog & Artikel", icon: FileText }
+                    { id: "blog", label: "Blog & Artikel", icon: FileText },
+                    { id: "impressum", label: "Impressum Page", icon: FileText },
+                    { id: "datenschutz", label: "Datenschutz Page", icon: ShieldCheck },
+                    { id: "cookies", label: "Cookie-Richtlinie", icon: Code }
                   ].map((s) => {
                     const Icon = s.icon;
                     return (
@@ -1587,6 +1590,93 @@ function AdminPage() {
                             </div>
                           </div>
                         ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Impressum Editor */}
+                  {cmsSection === "impressum" && (
+                    <div className="space-y-4">
+                      <h3 className="font-display text-lg font-bold border-b pb-2 flex items-center gap-2">
+                        <FileText className="h-5 w-5" /> Impressum bearbeiten
+                      </h3>
+                      <div className="space-y-2">
+                        <label className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">
+                          Impressum Text (Markdown-Format)
+                        </label>
+                        <p className="text-[10px] text-muted-foreground">
+                          Hier können Sie die Angaben gemäß § 5 TMG sowie den Haftungsausschluss anpassen.
+                        </p>
+                        <Textarea
+                          value={cmsContent.impressum?.text || ""}
+                          onChange={(e) => {
+                            const updated = { ...cmsContent };
+                            if (!updated.impressum) updated.impressum = { text: "" };
+                            updated.impressum.text = e.target.value;
+                            setCmsContent(updated);
+                          }}
+                          rows={15}
+                          className="font-mono text-xs bg-muted/40 focus:border-accent animate-in fade-in duration-200"
+                          placeholder="Schreiben Sie das Impressum im Markdown-Format..."
+                        />
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Datenschutz Editor */}
+                  {cmsSection === "datenschutz" && (
+                    <div className="space-y-4">
+                      <h3 className="font-display text-lg font-bold border-b pb-2 flex items-center gap-2">
+                        <ShieldCheck className="h-5 w-5" /> Datenschutzerklärung bearbeiten
+                      </h3>
+                      <div className="space-y-2">
+                        <label className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">
+                          Datenschutzerklärung Text (Markdown-Format)
+                        </label>
+                        <p className="text-[10px] text-muted-foreground">
+                          Hier können Sie die Datenschutzerklärung für Stadtfinanzen.de anpassen.
+                        </p>
+                        <Textarea
+                          value={cmsContent.datenschutz?.text || ""}
+                          onChange={(e) => {
+                            const updated = { ...cmsContent };
+                            if (!updated.datenschutz) updated.datenschutz = { text: "" };
+                            updated.datenschutz.text = e.target.value;
+                            setCmsContent(updated);
+                          }}
+                          rows={15}
+                          className="font-mono text-xs bg-muted/40 focus:border-accent animate-in fade-in duration-200"
+                          placeholder="Schreiben Sie die Datenschutzerklärung im Markdown-Format..."
+                        />
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Cookies Editor */}
+                  {cmsSection === "cookies" && (
+                    <div className="space-y-4">
+                      <h3 className="font-display text-lg font-bold border-b pb-2 flex items-center gap-2">
+                        <Code className="h-5 w-5" /> Cookie-Richtlinie bearbeiten
+                      </h3>
+                      <div className="space-y-2">
+                        <label className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">
+                          Cookie-Richtlinie Text (Markdown-Format)
+                        </label>
+                        <p className="text-[10px] text-muted-foreground">
+                          Hier können Sie die Richtlinien zur Cookie-Verwendung anpassen.
+                        </p>
+                        <Textarea
+                          value={cmsContent.cookies?.text || ""}
+                          onChange={(e) => {
+                            const updated = { ...cmsContent };
+                            if (!updated.cookies) updated.cookies = { text: "" };
+                            updated.cookies.text = e.target.value;
+                            setCmsContent(updated);
+                          }}
+                          rows={15}
+                          className="font-mono text-xs bg-muted/40 focus:border-accent animate-in fade-in duration-200"
+                          placeholder="Schreiben Sie die Cookie-Richtlinie im Markdown-Format..."
+                        />
                       </div>
                     </div>
                   )}
