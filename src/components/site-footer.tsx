@@ -45,9 +45,9 @@ export function SiteFooter() {
         <div className="mt-12 flex flex-col items-start justify-between gap-4 border-t border-primary-foreground/15 pt-6 text-xs text-primary-foreground/60 md:flex-row md:items-center">
           <div>© {new Date().getFullYear()} Stadtfinanzen.de · DSGVO-konform.</div>
           <div className="flex gap-6">
-            <a href="#" className="hover:text-accent">Datenschutz</a>
-            <a href="#" className="hover:text-accent">Impressum</a>
-            <a href="#" className="hover:text-accent">Cookies</a>
+            <Link to="/datenschutz" className="hover:text-accent">Datenschutz</Link>
+            <Link to="/impressum" className="hover:text-accent">Impressum</Link>
+            <Link to="/cookies" className="hover:text-accent">Cookies</Link>
           </div>
         </div>
       </div>
