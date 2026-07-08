@@ -26,7 +26,10 @@ import {
   ChevronRight,
   Image as ImageIcon,
   Code,
-  CheckSquare
+  CheckSquare,
+  ShieldCheck,
+  Building2,
+  Handshake
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
