@@ -571,21 +571,21 @@ function AdminPage() {
                 {/* CMS Sidebar Navigation */}
                 <div className="flex flex-col gap-1 border-r border-border/80 pr-4 h-fit">
                   {[
-                    { id: "general", label: "Allgemein & Scripts", icon: Code },
-                    { id: "hero", label: "Hero & Statistiken", icon: Globe },
-                    { id: "media", label: "Background Media", icon: ImageIcon },
-                    { id: "howitworks", label: "Ablauf (How It Works)", icon: CheckSquare },
-                    { id: "whyus", label: "Vorteile (Why Us)", icon: Sparkles },
-                    { id: "cta", label: "CTA Box & Button", icon: Layers },
-                    { id: "projects", label: "Projekttypen Cards", icon: Hammer },
-                    { id: "services", label: "Leistungen Cards", icon: Compass },
-                    { id: "pricing", label: "Preise (Pricing)", icon: Sparkles },
-                    { id: "about", label: "Über Uns Page", icon: FileText },
-                    { id: "contact", label: "Kontakt Details", icon: Phone },
-                    { id: "blog", label: "Blog & Artikel", icon: FileText },
-                    { id: "impressum", label: "Impressum Page", icon: FileText },
-                    { id: "datenschutz", label: "Datenschutz Page", icon: ShieldCheck },
-                    { id: "cookies", label: "Cookie-Richtlinie", icon: Code }
+                    { id: "general", label: "⚙️ Scripts & Header Code", icon: Code },
+                    { id: "hero", label: "🏠 Startseite — Hero & Statistiken", icon: Globe },
+                    { id: "media", label: "🏠 Startseite — Hintergrundbild/-video", icon: ImageIcon },
+                    { id: "howitworks", label: "🏠 Startseite — Ablauf (Schritte)", icon: CheckSquare },
+                    { id: "whyus", label: "🏠 Startseite — Vorteile (Warum wir)", icon: Sparkles },
+                    { id: "projects", label: "🏠 Startseite — Projekttypen-Karten", icon: Hammer },
+                    { id: "services", label: "🏠 Startseite — Leistungen-Karten", icon: Compass },
+                    { id: "pricing", label: "🏠 Startseite — Preise-Karten", icon: Zap },
+                    { id: "cta", label: "🏠 Startseite — CTA Banner & Button", icon: Layers },
+                    { id: "about", label: "📄 Leistungen-Seite (Über Uns)", icon: FileText },
+                    { id: "contact", label: "📞 Kontakt-Seite — Adresse & Details", icon: Phone },
+                    { id: "blog", label: "📝 Aktuelles — Blog & Artikel", icon: FileText },
+                    { id: "impressum", label: "⚖️ Impressum-Seite", icon: FileText },
+                    { id: "datenschutz", label: "🔒 Datenschutz-Seite", icon: ShieldCheck },
+                    { id: "cookies", label: "🍪 Cookie-Richtlinie-Seite", icon: Code }
                   ].map((s) => {
                     const Icon = s.icon;
                     return (

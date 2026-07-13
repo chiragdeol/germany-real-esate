@@ -212,15 +212,22 @@ function HowItWorks({ content }: { content: CMSContent | null }) {
   const steps = content?.homepageHowItWorks?.steps || defaultSteps;
 
   return (
-    <section className="border-b border-border bg-background py-24">
+    <section className="border-b border-border bg-background py-24 overflow-hidden">
       <div className="mx-auto max-w-7xl px-6">
         <SectionHeading eyebrow={sectionEyebrow} title={sectionTitle} />
-        <div className="mt-14 grid gap-10 md:grid-cols-2 lg:grid-cols-4">
-          {steps.map((s) => (
-            <div key={s.n} className="border-t border-foreground/15 pt-6">
-              <div className="font-display text-5xl text-accent">{s.n}</div>
-              <h3 className="mt-4 text-xl text-foreground">{s.title}</h3>
+        <div className="mt-14 grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+          {steps.map((s, i) => (
+            <div key={s.n} className="group relative rounded-2xl border border-border/60 bg-card p-8 transition-all duration-300 hover:border-accent/40 hover:shadow-[0_8px_40px_-8px] hover:shadow-accent/20 hover:-translate-y-1">
+              <div className="mb-5 inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-accent/20 to-accent/5 border border-accent/20">
+                <span className="font-display text-2xl font-bold text-accent">{s.n}</span>
+              </div>
+              <h3 className="text-lg font-semibold text-foreground">{s.title}</h3>
               <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{s.copy}</p>
+              {i < steps.length - 1 && (
+                <div className="absolute right-0 top-1/2 hidden -translate-y-1/2 translate-x-1/2 lg:block">
+                  <ArrowRight className="h-4 w-4 text-accent/40" />
+                </div>
+              )}
             </div>
           ))}
         </div>
@@ -242,7 +249,7 @@ function WhyUs({ content }: { content: CMSContent | null }) {
   const items = content?.homepageWhyUs?.items || defaultItems;
 
   return (
-    <section className="bg-background py-24">
+    <section className="bg-secondary/30 py-24">
       <div className="mx-auto max-w-7xl px-6">
         <SectionHeading eyebrow={sectionEyebrow} title={sectionTitle} />
         <p className="mt-6 max-w-2xl text-muted-foreground">
@@ -250,14 +257,16 @@ function WhyUs({ content }: { content: CMSContent | null }) {
           die Möglichkeit, Projekte direkt über privatwirtschaftliche Investoren
           zu finanzieren.
         </p>
-        <div className="mt-12 grid gap-10 md:grid-cols-2">
+        <div className="mt-12 grid gap-5 md:grid-cols-2">
           {items.map((item, i) => {
             const Icon = getIcon(item.icon);
             return (
-              <div key={i} className="flex gap-5 border-t border-border pt-6">
-                <Icon className="h-6 w-6 shrink-0 text-accent" />
+              <div key={i} className="group flex gap-5 rounded-2xl border border-border/60 bg-card p-7 transition-all duration-300 hover:border-accent/40 hover:shadow-[0_8px_40px_-8px] hover:shadow-accent/15 hover:-translate-y-0.5">
+                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-accent/20 to-accent/5 border border-accent/20 transition-colors group-hover:from-accent/30 group-hover:to-accent/10">
+                  <Icon className="h-5 w-5 text-accent" />
+                </div>
                 <div>
-                  <h3 className="text-lg text-foreground">{item.title}</h3>
+                  <h3 className="text-lg font-semibold text-foreground">{item.title}</h3>
                   <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{item.copy}</p>
                 </div>
               </div>
@@ -279,22 +288,25 @@ function ProjectTypes({ content }: { content: CMSContent | null }) {
   const items = content?.projectTypesList || defaultItems;
 
   return (
-    <section className="border-b border-border bg-secondary/40 py-24">
+    <section className="border-b border-border bg-background py-24">
       <div className="mx-auto max-w-7xl px-6">
         <SectionHeading eyebrow="Projekttypen" title="Diese Projekte können Sie platzieren." />
-        <div className="mt-12 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
           {items.map((item, i) => {
             const Icon = getIcon(item.icon);
             return (
-              <div key={i} className="bg-card p-6 shadow-[var(--shadow-card)]">
-                <Icon className="h-8 w-8 text-accent" />
-                <h3 className="mt-5 font-display text-xl text-foreground">{item.title}</h3>
-                <p className="mt-2 text-sm text-muted-foreground">{item.copy}</p>
+              <div key={i} className="group relative rounded-2xl border border-border/60 bg-card p-7 transition-all duration-300 hover:border-accent/50 hover:shadow-[0_12px_40px_-8px] hover:shadow-accent/25 hover:-translate-y-1 overflow-hidden">
+                <div className="absolute top-0 right-0 h-20 w-20 rounded-bl-[40px] bg-gradient-to-bl from-accent/10 to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
+                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-accent/20 to-accent/5 border border-accent/20">
+                  <Icon className="h-6 w-6 text-accent" />
+                </div>
+                <h3 className="mt-5 font-display text-xl font-semibold text-foreground">{item.title}</h3>
+                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{item.copy}</p>
               </div>
             );
           })}
         </div>
-        <p className="mt-12 max-w-3xl text-sm text-muted-foreground">
+        <p className="mt-12 max-w-3xl text-sm text-muted-foreground border-l-2 border-accent/40 pl-4">
           <strong className="text-foreground">Erstklassige Opportunitäten für institutionelle Investoren.</strong>{" "}
           Als Fondsgesellschaft, Private Equity oder Family Office finden Sie
           hier eine sorgfältige Auswahl. Stadtfinanzen.de ist kein Anbieter der
@@ -315,17 +327,20 @@ function Services({ content }: { content: CMSContent | null }) {
   const items = content?.homepageServices || defaultItems;
 
   return (
-    <section className="bg-background py-24">
+    <section className="bg-secondary/30 py-24">
       <div className="mx-auto max-w-7xl px-6">
         <SectionHeading eyebrow="Unsere Leistungen" title="Sie möchten mehr oder brauchen weitere Unterstützung?" />
-        <div className="mt-12 grid gap-10 md:grid-cols-3">
+        <div className="mt-12 grid gap-5 md:grid-cols-3">
           {items.map((item, i) => {
             const Icon = getIcon(item.icon);
             return (
-              <div key={i} className="border-t border-border pt-6">
-                <Icon className="h-6 w-6 text-accent" />
-                <h3 className="mt-4 font-display text-xl text-foreground">{item.title}</h3>
-                <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{item.copy}</p>
+              <div key={i} className="group relative flex flex-col rounded-2xl border border-border/60 bg-card p-8 transition-all duration-300 hover:border-accent/40 hover:shadow-[0_12px_40px_-8px] hover:shadow-accent/20 hover:-translate-y-1">
+                <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-accent/20 to-accent/5 border border-accent/20 transition-all group-hover:scale-110 group-hover:from-accent/30">
+                  <Icon className="h-5 w-5 text-accent" />
+                </div>
+                <h3 className="font-display text-xl font-semibold text-foreground">{item.title}</h3>
+                <p className="mt-3 flex-1 text-sm leading-relaxed text-muted-foreground">{item.copy}</p>
+                <div className="mt-5 h-0.5 w-8 bg-gradient-to-r from-accent to-accent/0 transition-all group-hover:w-16" />
               </div>
             );
           })}
@@ -345,17 +360,18 @@ function Pricing({ content }: { content: CMSContent | null }) {
   const tiers = content?.pricingTiers || defaultTiers;
 
   return (
-    <section className="border-y border-border bg-secondary/40 py-24">
+    <section className="border-y border-border bg-background py-24">
       <div className="mx-auto max-w-7xl px-6">
         <SectionHeading eyebrow="Unsere Preise" title="Transparent und erfolgsorientiert." />
         <p className="mt-6 max-w-2xl text-muted-foreground">
           Für Kapitalsuchende erheben wir lediglich eine kleine Provision in
           Höhe von 0,5 % des eingeworbenen Kapitals pro Jahr.
         </p>
-        <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
           {tiers.map((t, i) => (
-            <div key={i} className="bg-card p-6 shadow-[var(--shadow-card)]">
-              <div className="text-xs uppercase tracking-[0.2em] text-accent">{t.title}</div>
+            <div key={i} className="group relative rounded-2xl border border-border/60 bg-card p-7 transition-all duration-300 hover:border-accent/50 hover:shadow-[0_8px_40px_-8px] hover:shadow-accent/20 hover:-translate-y-0.5 overflow-hidden">
+              <div className="absolute inset-x-0 top-0 h-0.5 bg-gradient-to-r from-transparent via-accent to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
+              <div className="text-[10px] font-bold uppercase tracking-[0.25em] text-accent">{t.title}</div>
               <p className="mt-4 text-sm leading-relaxed text-muted-foreground">{t.copy}</p>
             </div>
           ))}

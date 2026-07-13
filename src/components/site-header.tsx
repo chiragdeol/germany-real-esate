@@ -3,6 +3,7 @@ import { Link } from "@tanstack/react-router";
 import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { LanguageTranslator } from "@/components/language-translator";
+import logoFull from "@/assets/logo-full.png";
 
 const nav = [
   { to: "/", label: "Startseite" },
@@ -17,12 +18,7 @@ export function SiteHeader() {
     <header className="sticky top-0 z-40 border-b border-border/60 bg-background/85 backdrop-blur">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-6">
         <Link to="/" className="flex items-center gap-2" onClick={() => setOpen(false)}>
-          <span className="grid h-8 w-8 place-items-center rounded-sm bg-primary text-primary-foreground font-display text-lg">
-            S
-          </span>
-          <span className="font-display text-xl tracking-wide text-foreground">
-            Stadtfinanzen<span className="text-accent">.de</span>
-          </span>
+          <img src={logoFull} alt="KommunalKapital" className="h-9 w-auto" />
         </Link>
         <nav className="hidden items-center gap-8 md:flex">
           {nav.map((n) => (
