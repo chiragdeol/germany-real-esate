@@ -136,7 +136,7 @@ function Hero({ content }: { content: CMSContent | null }) {
   ];
 
   return (
-    <section className="relative isolate overflow-hidden min-h-[calc(100vh-64px)] flex flex-col justify-center">
+    <section className="relative isolate overflow-hidden min-h-[calc(100vh-112px)] flex flex-col justify-center">
       {content?.hero.bgType === "image" && content?.hero.imageUrl ? (
         <img
           src={content.hero.imageUrl}

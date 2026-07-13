@@ -16,9 +16,9 @@ export function SiteHeader() {
   const [open, setOpen] = useState(false);
   return (
     <header className="sticky top-0 z-40 border-b border-border/60 bg-background/85 backdrop-blur">
-      <div className="mx-auto flex h-24 max-w-7xl items-center justify-between px-6">
+      <div className="mx-auto flex h-28 max-w-7xl items-center justify-between px-6">
         <Link to="/" className="flex items-center gap-2" onClick={() => setOpen(false)}>
-          <img src={logoFull} alt="KommunalKapital" className="h-20 w-auto" />
+          <img src={logoFull} alt="KommunalKapital" className="h-24 w-auto" />
         </Link>
         <nav className="hidden items-center gap-8 md:flex">
           {nav.map((n) => (

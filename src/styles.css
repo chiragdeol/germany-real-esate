@@ -63,26 +63,26 @@
 
 :root {
   --radius: 1.5rem;
-  /* Brand: deep navy + clean white + soft sky accent (Exporo-inspired) */
+  /* Brand: deep navy + clean white + soft green accent matched to KommunalKapital logo */
   --background: oklch(1 0 0);                    /* white */
-  --foreground: oklch(0.18 0.04 258);            /* deep navy ink */
+  --foreground: oklch(0.227 0.036 334.37);       /* logo deep navy */
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.18 0.04 258);
+  --card-foreground: oklch(0.227 0.036 334.37);
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.18 0.04 258);
-  --primary: oklch(0.22 0.06 258);               /* navy */
+  --popover-foreground: oklch(0.227 0.036 334.37);
+  --primary: oklch(0.227 0.036 334.37);          /* logo deep navy */
   --primary-foreground: oklch(1 0 0);
   --secondary: oklch(0.965 0.008 250);           /* pale blue-gray */
-  --secondary-foreground: oklch(0.22 0.06 258);
+  --secondary-foreground: oklch(0.227 0.036 334.37);
   --muted: oklch(0.965 0.006 250);
   --muted-foreground: oklch(0.46 0.02 260);
-  --accent: oklch(0.60 0.16 255);                /* bright blue accent */
-  --accent-foreground: oklch(1 0 0);
+  --accent: oklch(0.768 0.235 134.55);           /* logo vivid green accent */
+  --accent-foreground: oklch(0.227 0.036 334.37); /* logo deep navy for button text */
   --destructive: oklch(0.55 0.22 27);
   --destructive-foreground: oklch(1 0 0);
   --border: oklch(0.92 0.008 250);
   --input: oklch(0.92 0.008 250);
-  --ring: oklch(0.60 0.16 255);
+  --ring: oklch(0.768 0.235 134.55);
 
   --font-display: "DM Sans", "Inter", ui-sans-serif, system-ui, sans-serif;
   --font-sans: "DM Sans", "Inter", ui-sans-serif, system-ui, sans-serif;
