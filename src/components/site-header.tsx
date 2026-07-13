@@ -3,7 +3,7 @@ import { Link } from "@tanstack/react-router";
 import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { LanguageTranslator } from "@/components/language-translator";
-import logoFull from "@/assets/logo-full.png";
+import logoFull from "@/assets/favicon.png";
 
 const nav = [
   { to: "/", label: "Startseite" },
