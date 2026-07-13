@@ -34,7 +34,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { getLeads, getContent, saveContent, type LeadType, type CMSContent } from "@/lib/leads";
+import { getLeads, getContent, saveContent, DEFAULT_CONTENT, type LeadType, type CMSContent } from "@/lib/leads";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/admin")({
@@ -46,6 +46,39 @@ export const Route = createFileRoute("/admin")({
   }),
   component: AdminPage,
 });
+
+function mergeWithDefaults(fetched: any, defaults: any): any {
+  if (!fetched) return JSON.parse(JSON.stringify(defaults));
+  const result = { ...fetched };
+  
+  for (const key in defaults) {
+    if (defaults.hasOwnProperty(key)) {
+      const defaultValue = defaults[key];
+      const fetchedValue = fetched[key];
+      
+      if (fetchedValue === undefined || fetchedValue === null) {
+        result[key] = JSON.parse(JSON.stringify(defaultValue));
+      } else if (Array.isArray(defaultValue)) {
+        if (!Array.isArray(fetchedValue) || fetchedValue.length === 0) {
+          result[key] = JSON.parse(JSON.stringify(defaultValue));
+        } else {
+          result[key] = fetchedValue.map((item: any, idx: number) => {
+            const defItem = defaultValue[idx] || defaultValue[0] || {};
+            if (typeof item === 'object' && item !== null && typeof defItem === 'object') {
+              return { ...defItem, ...item };
+            }
+            return item;
+          });
+        }
+      } else if (typeof defaultValue === 'object' && defaultValue !== null) {
+        result[key] = mergeWithDefaults(fetchedValue, defaultValue);
+      } else if (typeof fetchedValue === 'string' && fetchedValue.trim() === '') {
+        result[key] = defaultValue;
+      }
+    }
+  }
+  return result;
+}
 
 function AdminPage() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -84,54 +117,10 @@ function AdminPage() {
       try {
         const fetchedLeads = await getLeads(adminToken);
         const fetchedContent = await getContent();
-        
-        // Ensure sub-objects have array initializers
-        if (!fetchedContent.projectTypesList) fetchedContent.projectTypesList = [];
-        if (!fetchedContent.homepageServices) fetchedContent.homepageServices = [];
-        if (!fetchedContent.pricingTiers) fetchedContent.pricingTiers = [];
-        if (!fetchedContent.about) {
-          fetchedContent.about = {
-            title: "",
-            introTitle: "",
-            introText1: "",
-            introText2: "",
-            projectTypes: []
-          };
-        }
-        
-        // Dynamic layout initializations
-        if (!fetchedContent.homepageHowItWorks) {
-          fetchedContent.homepageHowItWorks = {
-            title: "",
-            subtitle: "",
-            steps: []
-          };
-        }
-        if (!fetchedContent.homepageWhyUs) {
-          fetchedContent.homepageWhyUs = {
-            title: "",
-            subtitle: "",
-            items: []
-          };
-        }
-        if (!fetchedContent.homepageCta) {
-          fetchedContent.homepageCta = {
-            title: "",
-            subtitle: "",
-            buttonText: ""
-          };
-        }
-        if (!fetchedContent.videoSectionTexts) {
-          fetchedContent.videoSectionTexts = {
-            cityTitle: "",
-            cityCopy: "",
-            investorTitle: "",
-            investorCopy: ""
-          };
-        }
+        const mergedContent = mergeWithDefaults(fetchedContent, DEFAULT_CONTENT);
         
         setLeads(fetchedLeads);
-        setCmsContent(fetchedContent);
+        setCmsContent(mergedContent);
       } catch (err) {
         toast.error("Failed to load dashboard data.");
       } finally {
@@ -570,29 +559,83 @@ function AdminPage() {
               <div className="grid gap-6 md:grid-cols-[240px_1fr]">
                 {/* CMS Sidebar Navigation */}
                 <div className="flex flex-col gap-1 border-r border-border/80 pr-4 h-fit">
+                  {/* Category: Homepage */}
+                  <div className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/80 mt-1 mb-1.5 px-2">
+                    Startseite (Homepage)
+                  </div>
                   {[
-                    { id: "general", label: "⚙️ Scripts & Header Code", icon: Code },
-                    { id: "hero", label: "🏠 Startseite — Hero & Statistiken", icon: Globe },
-                    { id: "media", label: "🏠 Startseite — Hintergrundbild/-video", icon: ImageIcon },
-                    { id: "howitworks", label: "🏠 Startseite — Ablauf (Schritte)", icon: CheckSquare },
-                    { id: "whyus", label: "🏠 Startseite — Vorteile (Warum wir)", icon: Sparkles },
-                    { id: "projects", label: "🏠 Startseite — Projekttypen-Karten", icon: Hammer },
-                    { id: "services", label: "🏠 Startseite — Leistungen-Karten", icon: Compass },
-                    { id: "pricing", label: "🏠 Startseite — Preise-Karten", icon: Zap },
-                    { id: "cta", label: "🏠 Startseite — CTA Banner & Button", icon: Layers },
-                    { id: "about", label: "📄 Leistungen-Seite (Über Uns)", icon: FileText },
-                    { id: "contact", label: "📞 Kontakt-Seite — Adresse & Details", icon: Phone },
-                    { id: "blog", label: "📝 Aktuelles — Blog & Artikel", icon: FileText },
-                    { id: "impressum", label: "⚖️ Impressum-Seite", icon: FileText },
-                    { id: "datenschutz", label: "🔒 Datenschutz-Seite", icon: ShieldCheck },
-                    { id: "cookies", label: "🍪 Cookie-Richtlinie-Seite", icon: Code }
+                    { id: "hero", label: "Hero & Statistiken", icon: Globe },
+                    { id: "media", label: "Hintergrundbild/-video", icon: ImageIcon },
+                    { id: "howitworks", label: "Ablauf (Schritte)", icon: CheckSquare },
+                    { id: "whyus", label: "Vorteile (Warum wir)", icon: Sparkles },
+                    { id: "projects", label: "Projekttypen-Karten", icon: Hammer },
+                    { id: "services", label: "Leistungen-Karten", icon: Compass },
+                    { id: "pricing", label: "Preise-Karten", icon: Zap },
+                    { id: "cta", label: "CTA Banner & Button", icon: Layers }
                   ].map((s) => {
                     const Icon = s.icon;
                     return (
                       <button
                         key={s.id}
                         onClick={() => setCmsSection(s.id as any)}
-                        className={`flex items-center justify-between px-3 py-2 text-xs font-semibold rounded-md border text-left cursor-pointer transition-colors ${
+                        className={`flex items-center justify-between px-3 py-1.5 text-xs font-semibold rounded-md border text-left cursor-pointer transition-colors ${
+                          cmsSection === s.id
+                            ? "bg-accent/15 border-accent text-accent"
+                            : "bg-background border-transparent text-muted-foreground hover:text-foreground hover:bg-muted/40"
+                        }`}
+                      >
+                        <span className="flex items-center gap-2">
+                          <Icon className="h-3.5 w-3.5" /> {s.label}
+                        </span>
+                        <ChevronRight className="h-3 w-3 opacity-60" />
+                      </button>
+                    );
+                  })}
+
+                  {/* Category: Subpages */}
+                  <div className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/80 mt-3 mb-1.5 px-2">
+                    Unterseiten
+                  </div>
+                  {[
+                    { id: "about", label: "Leistungen (Über Uns)", icon: FileText },
+                    { id: "contact", label: "Kontakt & Adresse", icon: Phone },
+                    { id: "blog", label: "Aktuelles (Artikel)", icon: FileText }
+                  ].map((s) => {
+                    const Icon = s.icon;
+                    return (
+                      <button
+                        key={s.id}
+                        onClick={() => setCmsSection(s.id as any)}
+                        className={`flex items-center justify-between px-3 py-1.5 text-xs font-semibold rounded-md border text-left cursor-pointer transition-colors ${
+                          cmsSection === s.id
+                            ? "bg-accent/15 border-accent text-accent"
+                            : "bg-background border-transparent text-muted-foreground hover:text-foreground hover:bg-muted/40"
+                        }`}
+                      >
+                        <span className="flex items-center gap-2">
+                          <Icon className="h-3.5 w-3.5" /> {s.label}
+                        </span>
+                        <ChevronRight className="h-3 w-3 opacity-60" />
+                      </button>
+                    );
+                  })}
+
+                  {/* Category: Settings & Legal */}
+                  <div className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/80 mt-3 mb-1.5 px-2">
+                    Einstellungen
+                  </div>
+                  {[
+                    { id: "general", label: "Scripts & Header Code", icon: Code },
+                    { id: "impressum", label: "Impressum-Seite", icon: FileText },
+                    { id: "datenschutz", label: "Datenschutz-Seite", icon: ShieldCheck },
+                    { id: "cookies", label: "Cookie-Richtlinie-Seite", icon: Code }
+                  ].map((s) => {
+                    const Icon = s.icon;
+                    return (
+                      <button
+                        key={s.id}
+                        onClick={() => setCmsSection(s.id as any)}
+                        className={`flex items-center justify-between px-3 py-1.5 text-xs font-semibold rounded-md border text-left cursor-pointer transition-colors ${
                           cmsSection === s.id
                             ? "bg-accent/15 border-accent text-accent"
                             : "bg-background border-transparent text-muted-foreground hover:text-foreground hover:bg-muted/40"

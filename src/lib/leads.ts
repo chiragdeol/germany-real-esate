@@ -81,7 +81,7 @@ export interface CMSContent {
   cookies?: { text: string };
 }
 
-const DEFAULT_CONTENT: CMSContent = {
+export const DEFAULT_CONTENT: CMSContent = {
   hero: {
     title: "Wir strukturieren Kapital für komplexe Immobilienprojekte und Akquisitionen",
     subtitle: "Ab 5 Mio. | Mezzanine - Bridge - Fremdkapital. Stadtfinanzen.de begleitet bei der Beschaffung und Strukturierung von Immobilienfinanzierungen. Mit über 20 Jahren Erfahrung im Finanzierungsmarkt und einem europaweiten Netzwerk aus Mezzaninefonds, Banken, Debt-Fonds und Family Offices erschließen wir Kapitalquellen, die klassischen Wegen verschlossen bleiben. Persönliche Beratung, Schnelligkeit und Diskretion sind für uns besonders wichtig.",
