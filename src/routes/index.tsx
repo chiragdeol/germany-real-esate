@@ -136,7 +136,7 @@ function Hero({ content }: { content: CMSContent | null }) {
   ];
 
   return (
-    <section className="relative isolate overflow-hidden">
+    <section className="relative isolate overflow-hidden min-h-[calc(100vh-64px)] flex flex-col justify-center">
       {content?.hero.bgType === "image" && content?.hero.imageUrl ? (
         <img
           src={content.hero.imageUrl}
@@ -156,12 +156,12 @@ function Hero({ content }: { content: CMSContent | null }) {
         />
       )}
       <div className="absolute inset-0 -z-10 bg-primary/70" />
-      <div className="mx-auto grid max-w-7xl gap-10 px-6 py-28 md:py-40 text-primary-foreground">
+      <div className="mx-auto grid max-w-7xl gap-6 px-6 py-14 md:py-20 text-primary-foreground w-full">
         <div className="max-w-3xl">
-          <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-primary-foreground/25 px-3 py-1 text-xs uppercase tracking-[0.2em] text-primary-foreground/80">
+          <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-primary-foreground/25 px-3 py-1 text-xs uppercase tracking-[0.2em] text-primary-foreground/80">
             <Sparkles className="h-3 w-3 text-accent" /> National & International
           </div>
-          <h1 className="font-display text-5xl leading-[1.05] sm:text-6xl md:text-7xl">
+          <h1 className="font-display text-4xl leading-[1.05] sm:text-5xl md:text-6xl">
             {titleParts.length > 1 ? (
               <>
                 {titleParts[0]}
@@ -172,10 +172,10 @@ function Hero({ content }: { content: CMSContent | null }) {
               titleText
             )}
           </h1>
-          <p className="mt-6 max-w-2xl text-lg text-primary-foreground/80 leading-relaxed">
+          <p className="mt-4 max-w-2xl text-base text-primary-foreground/80 leading-relaxed">
             {subtitleText}
           </p>
-          <div className="mt-10 flex flex-wrap gap-4">
+          <div className="mt-7 flex flex-wrap gap-4">
             <Button asChild variant="hero" size="lg">
               <Link to="/contact" hash="investor">
                 Als Investor registrieren <ArrowRight className="h-4 w-4" />
@@ -186,7 +186,7 @@ function Hero({ content }: { content: CMSContent | null }) {
             </Button>
           </div>
         </div>
-        <dl className="mt-10 grid max-w-3xl grid-cols-2 gap-x-12 gap-y-6 border-t border-primary-foreground/15 pt-10 sm:grid-cols-4">
+        <dl className="mt-6 grid max-w-3xl grid-cols-2 gap-x-12 gap-y-4 border-t border-primary-foreground/15 pt-6 sm:grid-cols-4">
           {stats.map((stat, i) => (
             <div key={i}>
               <dt className="font-display text-3xl text-accent">{stat.value}</dt>

@@ -753,6 +753,32 @@ function AdminPage() {
                           placeholder="z.B. Direkter MP4 Link"
                         />
                       </div>
+
+                      {/* Video Section Texts & URLs */}
+                      <div className="space-y-4 border-t border-border pt-4">
+                        <h4 className="font-display text-base font-bold text-foreground">🎬 Erklärvideo-Karten — Texte & URLs</h4>
+                        <p className="text-xs text-muted-foreground">Diese Texte erscheinen auf den 2 Videokarten der Startseite.</p>
+                        <div className="grid gap-4 md:grid-cols-2">
+                          <div className="border border-border/60 rounded-xl p-4 space-y-3 bg-muted/10">
+                            <div className="text-[10px] font-bold uppercase tracking-wider text-accent">Karte 1 — Für Projektentwickler & Kommunen</div>
+                            <div className="space-y-1"><label className="text-xs font-semibold text-muted-foreground">Titel</label>
+                              <Input value={cmsContent.videoSectionTexts?.cityTitle || ""} onChange={(e) => { const u = { ...cmsContent }; if (!u.videoSectionTexts) u.videoSectionTexts = { cityTitle: "", cityCopy: "", investorTitle: "", investorCopy: "" }; u.videoSectionTexts.cityTitle = e.target.value; setCmsContent(u); }} className="h-8 text-xs" /></div>
+                            <div className="space-y-1"><label className="text-xs font-semibold text-muted-foreground">Beschreibung</label>
+                              <Textarea value={cmsContent.videoSectionTexts?.cityCopy || ""} onChange={(e) => { const u = { ...cmsContent }; if (!u.videoSectionTexts) u.videoSectionTexts = { cityTitle: "", cityCopy: "", investorTitle: "", investorCopy: "" }; u.videoSectionTexts.cityCopy = e.target.value; setCmsContent(u); }} rows={2} className="text-xs" /></div>
+                            <div className="space-y-1"><label className="text-xs font-semibold text-muted-foreground">YouTube / Vimeo URL</label>
+                              <Input value={cmsContent.videos?.cityVideoUrl || ""} onChange={(e) => { const u = { ...cmsContent }; if (!u.videos) u.videos = { cityVideoUrl: "", investorVideoUrl: "" }; u.videos.cityVideoUrl = e.target.value; setCmsContent(u); }} className="h-8 text-xs" placeholder="https://youtube.com/watch?v=..." /></div>
+                          </div>
+                          <div className="border border-border/60 rounded-xl p-4 space-y-3 bg-muted/10">
+                            <div className="text-[10px] font-bold uppercase tracking-wider text-accent">Karte 2 — Für Investoren</div>
+                            <div className="space-y-1"><label className="text-xs font-semibold text-muted-foreground">Titel</label>
+                              <Input value={cmsContent.videoSectionTexts?.investorTitle || ""} onChange={(e) => { const u = { ...cmsContent }; if (!u.videoSectionTexts) u.videoSectionTexts = { cityTitle: "", cityCopy: "", investorTitle: "", investorCopy: "" }; u.videoSectionTexts.investorTitle = e.target.value; setCmsContent(u); }} className="h-8 text-xs" /></div>
+                            <div className="space-y-1"><label className="text-xs font-semibold text-muted-foreground">Beschreibung</label>
+                              <Textarea value={cmsContent.videoSectionTexts?.investorCopy || ""} onChange={(e) => { const u = { ...cmsContent }; if (!u.videoSectionTexts) u.videoSectionTexts = { cityTitle: "", cityCopy: "", investorTitle: "", investorCopy: "" }; u.videoSectionTexts.investorCopy = e.target.value; setCmsContent(u); }} rows={2} className="text-xs" /></div>
+                            <div className="space-y-1"><label className="text-xs font-semibold text-muted-foreground">YouTube / Vimeo URL</label>
+                              <Input value={cmsContent.videos?.investorVideoUrl || ""} onChange={(e) => { const u = { ...cmsContent }; if (!u.videos) u.videos = { cityVideoUrl: "", investorVideoUrl: "" }; u.videos.investorVideoUrl = e.target.value; setCmsContent(u); }} className="h-8 text-xs" placeholder="https://youtube.com/watch?v=..." /></div>
+                          </div>
+                        </div>
+                      </div>
                     </div>
                   )}
 
