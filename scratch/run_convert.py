@@ -42,10 +42,10 @@ def oklab_to_oklch(lab):
 
 # Convert logo colors
 navy_rgb = [4, 27, 51]
-teal_rgb = [0, 211, 124]
+blue_rgb = [37, 150, 190] # #2596be
 
 navy_oklch = oklab_to_oklch(xyz_to_oklab(rgb_to_xyz(navy_rgb)))
-teal_oklch = oklab_to_oklch(xyz_to_oklab(rgb_to_xyz(teal_rgb)))
+blue_oklch = oklab_to_oklch(xyz_to_oklab(rgb_to_xyz(blue_rgb)))
 
 print(f"Navy oklch: {navy_oklch[0]:.4f} {navy_oklch[1]:.4f} {navy_oklch[2]:.4f}")
-print(f"Teal oklch: {teal_oklch[0]:.4f} {teal_oklch[1]:.4f} {teal_oklch[2]:.4f}")
+print(f"Blue oklch: {blue_oklch[0]:.4f} {blue_oklch[1]:.4f} {blue_oklch[2]:.4f}")
